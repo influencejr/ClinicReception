@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using ClinicReception.Core.Domain;
 
@@ -16,11 +16,17 @@ Appointment appointment = new()
 
 appointment.AddItem(new VisitItem
 {
-    ServiceCode = "CONS-01", Quantity = 1, UnitPrice = 650.00m, DurationMinutes = 20,
+    ServiceCode = "CONS-01",
+    Quantity = 1,
+    UnitPrice = 650.00m,
+    DurationMinutes = 20,
 });
 appointment.AddItem(new VisitItem
 {
-    ServiceCode = "ECG-01", Quantity = 1, UnitPrice = 320.50m, DurationMinutes = 15,
+    ServiceCode = "ECG-01",
+    Quantity = 1,
+    UnitPrice = 320.50m,
+    DurationMinutes = 15,
 });
 
 string total = appointment.Total()
