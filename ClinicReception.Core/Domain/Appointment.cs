@@ -6,18 +6,27 @@ public sealed class Appointment
     private readonly List<VisitItem> _items = new();
 
     public int Id { get; init; }
+
     public int PatientId { get; init; }
+
     public string DoctorCode { get; init; } = string.Empty;
+
     public DateOnly VisitDate { get; init; }
+
     public TimeOnly StartTime { get; init; }
+
     public VisitStatus Status { get; set; } = VisitStatus.Scheduled;
+
     public DateTimeOffset CreatedAt { get; init; }
+
     public IReadOnlyList<VisitItem> Items => _items;
 
     /// <summary>Додає послугу до запису.</summary>
+    /// <param name="item">Послуга, яку отримає пацієнт під час прийому.</param>
     public void AddItem(VisitItem item) => _items.Add(item);
 
     /// <summary>Обчислює вартість прийому.</summary>
+    /// <returns>Сума за всіма послугами запису, грн.</returns>
     public decimal Total()
     {
         decimal sum = 0m;
@@ -29,7 +38,8 @@ public sealed class Appointment
         return sum;
     }
 
-    /// <summary>Обчислює загальну тривалість прийому у хвилинах.</summary>
+    /// <summary>Обчислює загальну тривалість прийому.</summary>
+    /// <returns>Тривалість усіх послуг запису, хв.</returns>
     public int TotalMinutes()
     {
         int minutes = 0;

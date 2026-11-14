@@ -48,3 +48,32 @@ dotnet_naming_rule.interface_prefix.severity = warning
 dotnet_naming_symbols.interfaces.applicable_kinds = interface
 dotnet_naming_style.prefix_i.capitalization = pascal_case
 dotnet_naming_style.prefix_i.required_prefix = I
+
+# StyleCop: свідомо вимкнені правила
+# заголовок з ліцензією в навчальному проєкті не потрібен
+dotnet_diagnostic.SA1633.severity = none
+# префікс this. суперечить конвенції .NET; поля й так відрізняються префіксом _
+dotnet_diagnostic.SA1101.severity = none
+# using поза namespace — стандарт шаблонів .NET
+dotnet_diagnostic.SA1200.severity = none
+# приватні поля іменуємо з _, як прийнято в .NET (див. правило priv_underscore вище)
+dotnet_diagnostic.SA1309.severity = none
+# XML-документацію вимагатимемо з ЛР № 4, поки що ні
+dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1601.severity = none
+dotnet_diagnostic.SA1602.severity = none
+# кома в кінці багаторядкового ініціалізатора необов'язкова
+dotnet_diagnostic.SA1413.severity = none
+
+# правила, які лишаємо суворими
+# зайві пробіли в кінці рядка
+dotnet_diagnostic.SA1028.severity = warning
+# порядок членів класу: поля, конструктори, властивості, методи
+dotnet_diagnostic.SA1201.severity = warning
+# фігурні дужки обов'язкові навіть для однієї інструкції
+dotnet_diagnostic.SA1503.severity = warning
+# між членами класу — порожній рядок
+dotnet_diagnostic.SA1516.severity = warning
+# загальне форматування коду (те саме, що перевіряє dotnet format)
+dotnet_diagnostic.IDE0055.severity = warning
