@@ -101,3 +101,17 @@ dotnet_diagnostic.IDE0055.severity = warning
 dotnet_diagnostic.CA1707.severity = none
 # тести не є публічним API: поведінку описує ім'я тесту, XML-документація зайва
 dotnet_diagnostic.SA1600.severity = none
+
+[src/ClinicReception.Core/Legacy/**.cs]
+# клас-Бог з ЛР 4 (завдання 5) вносимо майже без змін, щоб провести аудит SOLID
+# на справжньому коді; секцію видаляємо разом із текою Legacy у завданні 6
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1503.severity = none
+dotnet_diagnostic.SA1516.severity = none
+dotnet_diagnostic.SA1122.severity = none
+dotnet_diagnostic.SA1402.severity = none
+dotnet_diagnostic.SA1649.severity = none
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA1716.severity = none
+dotnet_diagnostic.IDE0011.severity = none
