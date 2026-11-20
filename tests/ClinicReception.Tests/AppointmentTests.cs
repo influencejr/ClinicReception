@@ -16,8 +16,8 @@ public class AppointmentTests
     public void Total_TwoItems_SumsAmounts()
     {
         Appointment appointment = new() { Id = 1, PatientId = 10, DoctorCode = "DOC-THER-01" };
-        appointment.AddItem(new VisitItem { ServiceCode = "CONS-01", Quantity = 1, UnitPrice = 650m });
-        appointment.AddItem(new VisitItem { ServiceCode = "ECG-01", Quantity = 1, UnitPrice = 320.50m });
+        appointment.AddItem(new VisitItem("CONS-01", 1, 650m, 20));
+        appointment.AddItem(new VisitItem("ECG-01", 1, 320.50m, 15));
 
         decimal total = appointment.Total();
 
