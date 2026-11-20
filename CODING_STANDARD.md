@@ -29,7 +29,7 @@
 | N4 | Властивість | PascalCase, іменник | `StartTime` | `GetStartTime` |
 | N5 | Приватне поле [авто] | `_` + camelCase | `_items` | `m_Items`, `items` |
 | N6 | Локальна змінна, параметр | camelCase | `endTime` | `et`, `EndTime` |
-| N7 | Константа [авто] | PascalCase | `MaxSlotsPerDay` | `MAX_SLOTS` |
+| N7 | Константа, статичне поле лише для читання [авто] | PascalCase | `MaxSlotsPerDay`, `AllowedTransitions` | `MAX_SLOTS`, `_allowedTransitions` |
 | N8 | Перелічення | PascalCase, однина | `VisitStatus` | `VisitStatuses` |
 | N9 | Булеве значення | префікс `Is`/`Has`/`Can` | `HasInsurance` | `Insurance` |
 
@@ -142,6 +142,7 @@ bool overlaps = start < other.EndTime && other.StartTime < end;
 | N2 Префікс `I` в інтерфейсі | аналізатор іменування | `dotnet_naming_rule.interface_prefix`, `IDE1006` |
 | N5 Приватне поле з `_` | аналізатор іменування | `dotnet_naming_rule.priv_underscore`, `IDE1006` |
 | N7 Константа PascalCase | аналізатор іменування | `dotnet_naming_rule.const_pascal`, `IDE1006` |
+| N7 Статичне readonly-поле PascalCase | аналізатор іменування | `dotnet_naming_rule.static_readonly_pascal`, `SA1311` |
 | C2 XML-документація | компілятор, StyleCop | `GenerateDocumentationFile` (CS1591), `SA1600` |
 | G3 Попередження = помилки | файли `.csproj` | `TreatWarningsAsErrors` |
 | G3 Нуль попереджень | `Directory.Build.props` | `EnforceCodeStyleInBuild`, `AnalysisLevel` |
