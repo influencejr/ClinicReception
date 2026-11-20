@@ -33,8 +33,8 @@ public class VisitReportTests
         Patient: new PatientInfo("Іваненко", "i@ex.com", IsRegular: true),
         Items: new List<VisitItem>
         {
-            new() { ServiceCode = "PHYS-01", Quantity = 12, UnitPrice = 100m },
-            new() { ServiceCode = "CONS-01", Quantity = 1, UnitPrice = 250m },
+            new("PHYS-01", 12, 100m, 30),
+            new("CONS-01", 1, 250m, 20),
         },
         VisitDate: new DateOnly(2026, 3, 10),
         PromoCode: null,

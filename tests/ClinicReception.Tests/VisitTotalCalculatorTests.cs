@@ -15,8 +15,8 @@ public class VisitTotalCalculatorTests
             Patient: new PatientInfo("Іваненко", "i@ex.com", IsRegular: true),
             Items: new List<VisitItem>
             {
-                new() { ServiceCode = "PHYS-01", Quantity = 12, UnitPrice = 100m },
-                new() { ServiceCode = "CONS-01", Quantity = 1, UnitPrice = 250m },
+                new("PHYS-01", 12, 100m, 30),
+                new("CONS-01", 1, 250m, 20),
             },
             VisitDate: Tuesday,
             PromoCode: null,
@@ -37,7 +37,7 @@ public class VisitTotalCalculatorTests
             Patient: new PatientInfo("Петренко", "p@ex.com", IsRegular: false),
             Items: new List<VisitItem>
             {
-                new() { ServiceCode = "MASS-01", Quantity = 2, UnitPrice = 200m },
+                new("MASS-01", 2, 200m, 40),
             },
             VisitDate: Tuesday,
             PromoCode: PricingRules.CheckupPromoCode,
