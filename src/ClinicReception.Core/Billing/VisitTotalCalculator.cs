@@ -8,6 +8,25 @@ namespace ClinicReception.Core.Billing;
 /// </summary>
 public static class VisitTotalCalculator
 {
+    /// <summary>Обчислює підсумок візиту та стан, у який він переходить.</summary>
+    /// <param name="request">Коректний запит на розрахунок.</param>
+    /// <returns>Сума до сплати, заокруглена до копійок, і новий стан візиту.</returns>
+    /// <exception cref="ArgumentException">Запит порушує передумови (див. VisitGuards).</exception>
+    public static TotalResult Calculate(TotalRequest request)
+    {
+        VisitGuards.EnsureRequestValid(request);
+        decimal total = SubtotalOf(request.Items);
+        total -= RegularPatientDiscountOf(total, request.Patient.IsRegular);
+        total -= VolumeDiscountOf(total);
+        total -= PromoDiscountOf(total, request.PromoCode);
+        total -= SundayDiscountOf(total, request.VisitDate);
+        total += RegistrationFeeOf(total, request.RegistrationFee);
+        total = request.Status == VisitStatus.Cancelled
+            ? 0m
+            : Math.Round(Math.Max(total, 0m), 2);
+        return new TotalResult(total, NextStatusOf(request.Status, total));
+    }
+
     /// <summary>Обчислює суму послуг візиту зі знижкою за курс процедур.</summary>
     /// <param name="items">Непорожній перелік коректних послуг.</param>
     /// <returns>Сума за всіма послугами, грн.</returns>
