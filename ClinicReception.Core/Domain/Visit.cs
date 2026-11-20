@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace ClinicReception.Core.Domain;
 
 /// <summary>
@@ -84,7 +86,7 @@ public class Visit
     /// <param name="visits">Список візитів, у якому виконується пошук.</param>
     /// <param name="visitId">Номер шуканого візиту.</param>
     /// <returns>Знайдений візит або null, якщо візиту з таким номером немає.</returns>
-    public static Visit FindById(List<Visit> visits, string visitId)
+    public static Visit? FindById(List<Visit> visits, string visitId)
     {
         for (int i = 0; i < visits.Count; i++)
         {
@@ -107,8 +109,8 @@ public class Visit
     {
         string[] line = new string[3];
         line[0] = serviceCode;
-        line[1] = quantity.ToString();
-        line[2] = unitPrice.ToString();
+        line[1] = quantity.ToString(CultureInfo.CurrentCulture);
+        line[2] = unitPrice.ToString(CultureInfo.CurrentCulture);
         _lines.Add(line);
     }
 
@@ -123,8 +125,8 @@ public class Visit
         int lineCount = 0;
         for (int i = 0; i < _lines.Count; i++)
         {
-            int quantity = int.Parse(_lines[i][1]);
-            decimal unitPrice = decimal.Parse(_lines[i][2]);
+            int quantity = int.Parse(_lines[i][1], CultureInfo.CurrentCulture);
+            decimal unitPrice = decimal.Parse(_lines[i][2], CultureInfo.CurrentCulture);
             total += quantity * unitPrice;
             lineCount++;
         }
@@ -214,7 +216,9 @@ public class Visit
         string report = string.Empty;
         for (int i = 0; i < _lines.Count; i++)
         {
-            decimal lineAmount = int.Parse(_lines[i][1]) * decimal.Parse(_lines[i][2]);
+            int quantity = int.Parse(_lines[i][1], CultureInfo.CurrentCulture);
+            decimal unitPrice = decimal.Parse(_lines[i][2], CultureInfo.CurrentCulture);
+            decimal lineAmount = quantity * unitPrice;
             report = report
                 + "Послуга: " + _lines[i][0]
                 + "; кількість: " + _lines[i][1]
