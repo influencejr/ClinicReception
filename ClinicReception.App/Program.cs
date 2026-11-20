@@ -9,5 +9,5 @@ visit.AddLine("INJ-01", 12, 90m);
 Console.WriteLine(visit.CalculateTotal(false));
 Console.WriteLine(visit.CalculateTotal(true));
 Console.WriteLine(visit.IsValid());
-Console.WriteLine(visit.TryChangeStatus(1));
+Console.WriteLine(visit.TryChangeStatus(Visit.StatusConfirmed));
 Console.Write(visit.BuildReport());
