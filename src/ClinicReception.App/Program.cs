@@ -45,6 +45,8 @@ appointment.AddItem(new VisitItem("ECG-01", 1, 350m, 15));
 Console.WriteLine();
 service.Book(appointment, patient);
 Console.WriteLine($"Сума: {service.TotalOf(appointment):0.00}");
+Console.WriteLine();
+Console.Write(AppointmentCsvReport.BuildCsv(repository.GetAll()));
 
 static TotalRequest BuildSampleRequest() => new(
     VisitId: 1,

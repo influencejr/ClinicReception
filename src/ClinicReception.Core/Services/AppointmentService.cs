@@ -10,6 +10,12 @@ namespace ClinicReception.Core.Services;
 /// </summary>
 public sealed class AppointmentService
 {
+    /// <summary>Сума, понад яку діє знижка за великий чек, грн.</summary>
+    public const decimal LargeVisitFrom = 1000m;
+
+    /// <summary>Фіксована знижка за великий чек, грн.</summary>
+    public const decimal LargeVisitDiscount = 50m;
+
     private readonly IAppointmentRepository _repository;
     private readonly IPricingPolicy _pricing;
     private readonly INotifier _notifier;
@@ -47,7 +53,10 @@ public sealed class AppointmentService
         _notifier.Notify(patient.Email, message);
     }
 
-    /// <summary>Обчислює вартість запису за політикою ціноутворення.</summary>
+    /// <summary>
+    /// Обчислює вартість запису: ціни послуг за політикою, а якщо сума більша
+    /// за <see cref="LargeVisitFrom"/>, мінус <see cref="LargeVisitDiscount"/>.
+    /// </summary>
     /// <param name="appointment">Запис на прийом.</param>
     /// <returns>Сума до сплати, грн.</returns>
     /// <exception cref="ArgumentNullException">Запис не передано.</exception>
@@ -60,6 +69,6 @@ public sealed class AppointmentService
             total += _pricing.PriceOf(item);
         }
 
-        return total;
+        return total > LargeVisitFrom ? total - LargeVisitDiscount : total;
     }
 }
