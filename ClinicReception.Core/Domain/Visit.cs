@@ -4,7 +4,7 @@ using System.Linq;
 namespace ClinicReception.Core.Domain
 {
 // клас
-public class vizyt
+public class Visit
 {
 public string id;
 public string pc;
@@ -13,7 +13,7 @@ public List<string[]> ln = new List<string[]>();
 public DateTime dt;
 // public string prim;   // примітка, поки не треба
 // конструктор
-   public vizyt(string a, string b)
+   public Visit(string a, string b)
 {
 id = a;              // ставимо id
       pc = b;         // ставимо pc
@@ -72,7 +72,7 @@ return false;
     return s;   // повертаємо s
     }
     // пошук
-    public static vizyt F(List<vizyt> L, string x)
+    public static Visit F(List<Visit> L, string x)
     {
     for (int i = 0; i < L.Count; i++)
     {
