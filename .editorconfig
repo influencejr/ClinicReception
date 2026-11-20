@@ -91,6 +91,8 @@ dotnet_diagnostic.IDE0055.severity = warning
 [tests/**.cs]
 # імена тестів за схемою Метод_Умова_Результат (N13) містять підкреслення
 dotnet_diagnostic.CA1707.severity = none
+# тести не є публічним API: поведінку описує ім'я тесту, XML-документація зайва
+dotnet_diagnostic.SA1600.severity = none
 
 [src/ClinicReception.Core/Legacy/**.cs]
 # успадкований метод вносимо в первісному вигляді, щоб зафіксувати його поведінку

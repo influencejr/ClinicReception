@@ -7,6 +7,9 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- XML-документація для тестів не генерується: поведінку описує ім'я тесту (N13),
+         тому службове повідомлення StyleCop про вимкнений аналіз документації не потрібне -->
+    <NoWarn>$(NoWarn);SA0001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
