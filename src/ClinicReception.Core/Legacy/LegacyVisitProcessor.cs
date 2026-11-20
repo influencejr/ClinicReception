@@ -13,51 +13,24 @@ public static class LegacyVisitProcessor
         out VisitStatus newStatus)
     {
         VisitGuards.EnsureHeaderValid(visitId, patientName, patientEmail);
-        VisitGuards.EnsureItemsValid(items);
-        newStatus = status;
-        decimal total = 0;
-        for (int i = 0; i < items.Count; i++)
-        {
-            decimal sum = items[i].Quantity * items[i].UnitPrice;
-            if (items[i].Quantity >= PricingRules.BulkQuantity)
-                sum -= sum * PricingRules.BulkRate;
-            total = total + sum;
-        }
-        if (isRegular)
-            total -= total * PricingRules.RegularPatientRate;
-        if (total > PricingRules.LargeVisitFrom)
-            total -= total * PricingRules.LargeVisitRate;
-        else if (total > PricingRules.MediumVisitFrom)
-            total -= total * PricingRules.MediumVisitRate;
-        if (promoCode == PricingRules.CheckupPromoCode)
-            total -= total * PricingRules.CheckupPromoRate;
-        else if (promoCode == PricingRules.FixedPromoCode && total > PricingRules.FixedPromoFrom)
-            total -= PricingRules.FixedPromoAmount;
-        if (visitDate.DayOfWeek == DayOfWeek.Sunday)
-            total -= total * PricingRules.SundayRate;
-        if (total < PricingRules.FreeRegistrationFrom)
-            total += registrationFee;
-        if (total < 0)
-            total = 0;
-        total = Math.Round(total, 2);
-        if (status == VisitStatus.Scheduled && total > 0)
-            newStatus = VisitStatus.Confirmed;
-        else if (status == VisitStatus.Confirmed)
-            newStatus = VisitStatus.Completed;
-        else if (status == VisitStatus.Cancelled)
-        {
-            newStatus = VisitStatus.Cancelled;
-            total = 0;
-        }
+        decimal total = VisitTotalCalculator.SubtotalOf(items);
+        total -= VisitTotalCalculator.RegularPatientDiscountOf(total, isRegular);
+        total -= VisitTotalCalculator.VolumeDiscountOf(total);
+        total -= VisitTotalCalculator.PromoDiscountOf(total, promoCode);
+        total -= VisitTotalCalculator.SundayDiscountOf(total, visitDate);
+        total += VisitTotalCalculator.RegistrationFeeOf(total, registrationFee);
+        total = status == VisitStatus.Cancelled
+            ? 0m
+            : Math.Round(Math.Max(total, 0m), 2);
+        newStatus = VisitTotalCalculator.NextStatusOf(status, total);
         if (printToConsole)
         {
             Console.WriteLine("Візит № " + visitId);
             Console.WriteLine("Пацієнт: " + patientName);
             Console.WriteLine("Пошта: " + patientEmail);
-            for (int i = 0; i < items.Count; i++)
+            foreach (VisitItem item in items)
             {
-                Console.WriteLine(items[i].ServiceCode + " x " +
-                    items[i].Quantity);
+                Console.WriteLine(item.ServiceCode + " x " + item.Quantity);
             }
             Console.WriteLine("Разом: " + total);
             Console.WriteLine("Стан: " + newStatus);
