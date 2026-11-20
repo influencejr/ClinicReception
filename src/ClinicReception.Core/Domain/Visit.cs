@@ -7,18 +7,6 @@ namespace ClinicReception.Core.Domain;
 /// </summary>
 public class Visit
 {
-    /// <summary>Стан: візит заплановано.</summary>
-    public const int StatusScheduled = 0;
-
-    /// <summary>Стан: пацієнт підтвердив візит.</summary>
-    public const int StatusConfirmed = 1;
-
-    /// <summary>Стан: візит завершено.</summary>
-    public const int StatusCompleted = 2;
-
-    /// <summary>Стан: візит скасовано.</summary>
-    public const int StatusCancelled = 3;
-
     /// <summary>Ставка податку на додану вартість.</summary>
     private const decimal VatRate = 0.2m;
 
@@ -47,11 +35,11 @@ public class Visit
     private const int MinPatientNameLength = 3;
 
     /// <summary>Дозволені переходи стану: пара «поточний стан — новий стан».</summary>
-    private static readonly HashSet<(int From, int To)> AllowedTransitions = new()
+    private static readonly HashSet<(VisitStatus From, VisitStatus To)> AllowedTransitions = new()
     {
-        (StatusScheduled, StatusConfirmed),
-        (StatusConfirmed, StatusCompleted),
-        (StatusScheduled, StatusCancelled),
+        (VisitStatus.Scheduled, VisitStatus.Confirmed),
+        (VisitStatus.Confirmed, VisitStatus.Completed),
+        (VisitStatus.Scheduled, VisitStatus.Cancelled),
     };
 
     private readonly List<string[]> _lines = new List<string[]>();
@@ -61,8 +49,11 @@ public class Visit
     /// </summary>
     /// <param name="id">Номер візиту, наприклад «V-1001».</param>
     /// <param name="patientName">Прізвище пацієнта.</param>
+    /// <exception cref="ArgumentException">Номер або прізвище порожні.</exception>
     public Visit(string id, string patientName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(patientName);
         Id = id;
         PatientName = patientName;
         CreatedAt = DateTimeOffset.Now;
@@ -79,23 +70,20 @@ public class Visit
     public string PatientName { get; private set; }
 
     /// <summary>
-    /// Код стану візиту.
+    /// Стан візиту в його життєвому циклі.
     /// </summary>
-    public int Status { get; private set; } = StatusScheduled;
+    public VisitStatus Status { get; private set; } = VisitStatus.Scheduled;
 
     /// <summary>
     /// Момент створення візиту.
     /// </summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
-    private bool HasId => !string.IsNullOrEmpty(Id);
-
-    private bool HasPatientName =>
-        PatientName is not null && PatientName.Length >= MinPatientNameLength;
+    private bool HasPatientName => PatientName.Length >= MinPatientNameLength;
 
     private bool HasAllowedLineCount => _lines.Count > 0 && _lines.Count < MaxLineCount;
 
-    private bool HasKnownStatus => Status >= StatusScheduled && Status <= StatusCancelled;
+    private bool HasKnownStatus => Enum.IsDefined(Status);
 
     /// <summary>
     /// Шукає візит за номером.
@@ -103,8 +91,12 @@ public class Visit
     /// <param name="visits">Список візитів, у якому виконується пошук.</param>
     /// <param name="visitId">Номер шуканого візиту.</param>
     /// <returns>Знайдений візит або null, якщо візиту з таким номером немає.</returns>
+    /// <exception cref="ArgumentNullException">Список не передано.</exception>
+    /// <exception cref="ArgumentException">Номер шуканого візиту порожній.</exception>
     public static Visit? FindById(List<Visit> visits, string visitId)
     {
+        ArgumentNullException.ThrowIfNull(visits);
+        ArgumentException.ThrowIfNullOrWhiteSpace(visitId);
         for (int i = 0; i < visits.Count; i++)
         {
             if (visits[i].Id == visitId)
@@ -122,8 +114,13 @@ public class Visit
     /// <param name="serviceCode">Код послуги за прайсом клініки.</param>
     /// <param name="quantity">Кількість одиниць послуги.</param>
     /// <param name="unitPrice">Ціна за одиницю без ПДВ, грн.</param>
+    /// <exception cref="ArgumentException">Код послуги порожній.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Кількість не додатна або ціна від'ємна.</exception>
     public void AddLine(string serviceCode, int quantity, decimal unitPrice)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(serviceCode);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        ArgumentOutOfRangeException.ThrowIfNegative(unitPrice);
         string[] line = new string[3];
         line[0] = serviceCode;
         line[1] = quantity.ToString(CultureInfo.CurrentCulture);
@@ -154,12 +151,12 @@ public class Visit
     /// <summary>
     /// Змінює стан візиту, якщо перехід дозволений правилами реєстратури.
     /// </summary>
-    /// <param name="newStatus">Код цільового стану візиту (константа Status…).</param>
+    /// <param name="newStatus">Цільовий стан візиту.</param>
     /// <returns>
     /// true, якщо перехід виконано; false, якщо він заборонений
     /// і стан візиту лишився попереднім.
     /// </returns>
-    public bool TryChangeStatus(int newStatus)
+    public bool TryChangeStatus(VisitStatus newStatus)
     {
         if (!AllowedTransitions.Contains((Status, newStatus)))
         {
@@ -173,8 +170,8 @@ public class Visit
     /// <summary>
     /// Перевіряє, чи заповнено візит достатньо для обліку.
     /// </summary>
-    /// <returns>true, якщо номер, пацієнт, послуги й стан коректні.</returns>
-    public bool IsValid() => HasId && HasPatientName && HasAllowedLineCount && HasKnownStatus;
+    /// <returns>true, якщо прізвище пацієнта, кількість послуг і стан коректні.</returns>
+    public bool IsValid() => HasPatientName && HasAllowedLineCount && HasKnownStatus;
 
     /// <summary>
     /// Формує текстовий звіт про послуги візиту.

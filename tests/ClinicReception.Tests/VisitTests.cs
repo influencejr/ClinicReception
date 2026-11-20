@@ -55,10 +55,10 @@ public class VisitTests
     {
         Visit visit = SampleVisit();
 
-        bool changed = visit.TryChangeStatus(Visit.StatusConfirmed);
+        bool changed = visit.TryChangeStatus(VisitStatus.Confirmed);
 
         Assert.True(changed);
-        Assert.Equal(Visit.StatusConfirmed, visit.Status);
+        Assert.Equal(VisitStatus.Confirmed, visit.Status);
     }
 
     [Fact]
@@ -66,22 +66,22 @@ public class VisitTests
     {
         Visit visit = SampleVisit();
 
-        bool changed = visit.TryChangeStatus(Visit.StatusCompleted);
+        bool changed = visit.TryChangeStatus(VisitStatus.Completed);
 
         Assert.False(changed);
-        Assert.Equal(Visit.StatusScheduled, visit.Status);
+        Assert.Equal(VisitStatus.Scheduled, visit.Status);
     }
 
     [Fact]
     public void TryChangeStatus_ConfirmedToCompleted_ReturnsTrue()
     {
         Visit visit = SampleVisit();
-        visit.TryChangeStatus(Visit.StatusConfirmed);
+        visit.TryChangeStatus(VisitStatus.Confirmed);
 
-        bool changed = visit.TryChangeStatus(Visit.StatusCompleted);
+        bool changed = visit.TryChangeStatus(VisitStatus.Completed);
 
         Assert.True(changed);
-        Assert.Equal(Visit.StatusCompleted, visit.Status);
+        Assert.Equal(VisitStatus.Completed, visit.Status);
     }
 
     [Fact]
@@ -89,10 +89,10 @@ public class VisitTests
     {
         Visit visit = SampleVisit();
 
-        bool changed = visit.TryChangeStatus(Visit.StatusCancelled);
+        bool changed = visit.TryChangeStatus(VisitStatus.Cancelled);
 
         Assert.True(changed);
-        Assert.Equal(Visit.StatusCancelled, visit.Status);
+        Assert.Equal(VisitStatus.Cancelled, visit.Status);
     }
 
     [Fact]
@@ -152,6 +152,28 @@ public class VisitTests
         {
             CultureInfo.CurrentCulture = previous;
         }
+    }
+
+    [Fact]
+    public void Constructor_EmptyId_ThrowsArgument()
+    {
+        Assert.Throws<ArgumentException>(() => new Visit(" ", "Іваненко"));
+    }
+
+    [Fact]
+    public void AddLine_ZeroQuantity_ThrowsOutOfRange()
+    {
+        Visit visit = new("V-4001", "Іваненко");
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => visit.AddLine("CONS-01", 0, 650m));
+    }
+
+    [Fact]
+    public void AddLine_NegativePrice_ThrowsOutOfRange()
+    {
+        Visit visit = new("V-4002", "Іваненко");
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => visit.AddLine("CONS-01", 1, -1m));
     }
 
     private static Visit SampleVisit()
