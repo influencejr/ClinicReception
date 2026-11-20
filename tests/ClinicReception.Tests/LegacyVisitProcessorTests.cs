@@ -24,13 +24,13 @@ public class LegacyVisitProcessorTests
             items,
             Tuesday,
             string.Empty,
-            "Scheduled",
+            VisitStatus.Scheduled,
             false,
             60m,
-            out string next);
+            out VisitStatus next);
 
         Assert.Equal(1292.70m, total);
-        Assert.Equal("Confirmed", next);
+        Assert.Equal(VisitStatus.Confirmed, next);
     }
 
     [Fact]
@@ -49,19 +49,19 @@ public class LegacyVisitProcessorTests
             items,
             Tuesday,
             "CHECKUP10",
-            "Confirmed",
+            VisitStatus.Confirmed,
             false,
             60m,
-            out string next);
+            out VisitStatus next);
 
         Assert.Equal(420m, total);
-        Assert.Equal("Completed", next);
+        Assert.Equal(VisitStatus.Completed, next);
     }
 
     [Fact]
-    public void Process_NoItems_ReturnsMinusOne()
+    public void Process_NoItems_ThrowsArgument()
     {
-        decimal total = LegacyVisitProcessor.Process(
+        Assert.Throws<ArgumentException>(() => LegacyVisitProcessor.Process(
             3,
             "Коваль",
             "k@ex.com",
@@ -69,11 +69,9 @@ public class LegacyVisitProcessorTests
             new List<VisitItem>(),
             Tuesday,
             string.Empty,
-            "Scheduled",
+            VisitStatus.Scheduled,
             false,
             60m,
-            out _);
-
-        Assert.Equal(-1m, total);
+            out _));
     }
 }
