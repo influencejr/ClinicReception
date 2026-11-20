@@ -55,4 +55,18 @@ internal static class VisitGuards
             EnsureItemValid(item);
         }
     }
+
+    /// <summary>Перевіряє запит на розрахунок цілком: пацієнта, послуги та збір.</summary>
+    /// <param name="request">Запит на розрахунок вартості візиту.</param>
+    /// <exception cref="ArgumentNullException">Запит або пацієнта не передано.</exception>
+    /// <exception cref="ArgumentException">Заголовок чи послуги некоректні.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Номер, кількість, ціна чи збір поза межами.</exception>
+    public static void EnsureRequestValid(TotalRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.Patient);
+        EnsureHeaderValid(request.VisitId, request.Patient.Name, request.Patient.Email);
+        EnsureItemsValid(request.Items);
+        ArgumentOutOfRangeException.ThrowIfNegative(request.RegistrationFee);
+    }
 }
