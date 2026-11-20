@@ -3,11 +3,11 @@ using ClinicReception.Core.Domain;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-var z = new Visit("V-1001", "Іваненко");
-z.Add("PHYS-01", 3, 250m);
-z.Add("INJ-01", 12, 90m);
-Console.WriteLine(z.ProcessData(false));
-Console.WriteLine(z.ProcessData(true));
-Console.WriteLine(z.Ck());
-Console.WriteLine(z.Chg(1));
-Console.Write(z.Rep());
+var visit = new Visit("V-1001", "Іваненко");
+visit.AddLine("PHYS-01", 3, 250m);
+visit.AddLine("INJ-01", 12, 90m);
+Console.WriteLine(visit.CalculateTotal(false));
+Console.WriteLine(visit.CalculateTotal(true));
+Console.WriteLine(visit.IsValid());
+Console.WriteLine(visit.TryChangeStatus(1));
+Console.Write(visit.BuildReport());
