@@ -4,29 +4,53 @@ using System.Linq;
 
 namespace ClinicReception.Core.Domain;
 
-// клас
+/// <summary>
+/// Візит пацієнта до клініки з переліком наданих послуг.
+/// </summary>
 public class Visit
 {
     private readonly List<string[]> _lines = new List<string[]>();
 
     // public string prim;   // примітка, поки не треба
-    // конструктор
+
+    /// <summary>
+    /// Створює візит у початковому стані.
+    /// </summary>
+    /// <param name="id">Номер візиту, наприклад «V-1001».</param>
+    /// <param name="patientName">Прізвище пацієнта.</param>
     public Visit(string id, string patientName)
     {
-        Id = id;              // ставимо id
-        PatientName = patientName;         // ставимо pc
-        CreatedAt = DateTimeOffset.Now;   // ставимо дату
+        Id = id;
+        PatientName = patientName;
+        CreatedAt = DateTimeOffset.Now;
     }
 
+    /// <summary>
+    /// Номер візиту.
+    /// </summary>
     public string Id { get; private set; }
 
+    /// <summary>
+    /// Прізвище пацієнта, записаного на візит.
+    /// </summary>
     public string PatientName { get; private set; }
 
+    /// <summary>
+    /// Код стану візиту.
+    /// </summary>
     public int Status { get; private set; } = 0; // 0-новий,1-підтв,2-заверш,3-скасов
 
+    /// <summary>
+    /// Момент створення візиту.
+    /// </summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
-    // пошук
+    /// <summary>
+    /// Шукає візит за номером.
+    /// </summary>
+    /// <param name="visits">Список візитів, у якому виконується пошук.</param>
+    /// <param name="visitId">Номер шуканого візиту.</param>
+    /// <returns>Знайдений візит або null, якщо візиту з таким номером немає.</returns>
     public static Visit FindById(List<Visit> visits, string visitId)
     {
         for (int i = 0; i < visits.Count; i++)
@@ -40,17 +64,26 @@ public class Visit
         return null;
     }
 
-    // метод додавання
+    /// <summary>
+    /// Додає до візиту рядок із наданою послугою.
+    /// </summary>
+    /// <param name="serviceCode">Код послуги за прайсом клініки.</param>
+    /// <param name="quantity">Кількість одиниць послуги.</param>
+    /// <param name="unitPrice">Ціна за одиницю без ПДВ, грн.</param>
     public void AddLine(string serviceCode, int quantity, decimal unitPrice)
     {
         string[] line = new string[3];
         line[0] = serviceCode;
         line[1] = quantity.ToString();
         line[2] = unitPrice.ToString();
-        _lines.Add(line);   // додаємо t у ln
+        _lines.Add(line);
     }
 
-    // ProcessData
+    /// <summary>
+    /// Обчислює вартість візиту з урахуванням знижок і ПДВ.
+    /// </summary>
+    /// <param name="hasInsurance">Ознака пацієнта зі страховим полісом.</param>
+    /// <returns>Сума до сплати, грн, заокруглена до двох знаків.</returns>
     public decimal CalculateTotal(bool hasInsurance)
     {
         decimal total = 0;
@@ -59,11 +92,12 @@ public class Visit
         {
             int quantity = int.Parse(_lines[i][1]);
             decimal unitPrice = decimal.Parse(_lines[i][2]);
-            total = total + (quantity * unitPrice);   // додаємо до суми
-            lineCount = lineCount + 1;     // збільшуємо kolvo на одиницю
+            total = total + (quantity * unitPrice);
+            lineCount = lineCount + 1;
         }
 
         // if (sum1 > 500) { sum1 = sum1 - 50; } // стара знижка
+        // знижки не підсумовуються: страхова має пріоритет над знижкою за великий чек
         if (hasInsurance == true && total > 1000)
         {
             total = total * 0.9m;
@@ -87,11 +121,19 @@ public class Visit
             total = 0;
         }
 
+        // ПДВ нараховується на суму вже після всіх знижок
         total = total + (total * 0.2m);
-        return Math.Round(total, 2);   // повертаємо sum1
+        return Math.Round(total, 2);
     }
 
-    // міняємо статус
+    /// <summary>
+    /// Змінює стан візиту, якщо перехід дозволений правилами реєстратури.
+    /// </summary>
+    /// <param name="newStatus">Код цільового стану візиту.</param>
+    /// <returns>
+    /// true, якщо перехід виконано; false, якщо він заборонений
+    /// і стан візиту лишився попереднім.
+    /// </returns>
     public bool TryChangeStatus(int newStatus)
     {
         if (Status == 0 && newStatus == 1)
@@ -112,10 +154,13 @@ public class Visit
             return true;
         }
 
-        return false;   // не можна
+        return false;
     }
 
-    // перевірка
+    /// <summary>
+    /// Перевіряє, чи заповнено візит достатньо для обліку.
+    /// </summary>
+    /// <returns>true, якщо номер, пацієнт, послуги й стан коректні.</returns>
     public bool IsValid()
     {
         if (Id is not null && Id.Length > 0
@@ -132,7 +177,10 @@ public class Visit
         return false;
     }
 
-    // звіт
+    /// <summary>
+    /// Формує текстовий звіт про послуги візиту.
+    /// </summary>
+    /// <returns>Рядки з послугами та підсумок без страхової знижки.</returns>
     public string BuildReport()
     {
         string report = string.Empty;
@@ -147,6 +195,6 @@ public class Visit
         }
 
         report = report + "Разом: " + CalculateTotal(false) + "\n";
-        return report;   // повертаємо s
+        return report;
     }
 }
