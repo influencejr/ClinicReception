@@ -18,7 +18,23 @@ new VisitReportPrinter(Console.Out).Print(report);
 
 // ЛР 4: композиційний корінь - єдине місце, де створюються конкретні реалізації
 InMemoryAppointmentRepository repository = new();
-IPricingPolicy pricing = new DiscountPricingPolicy(0.05m);
+const decimal RegularPatientRate = 0.05m;
+const decimal InsuredPatientRate = 0.10m;
+const decimal StaffRate = 0.30m;
+
+// таблиця «тип пацієнта - політика» замість ланцюга if у логіці (OCP);
+// новий тип пацієнта - новий рядок тут або новий клас політики
+Dictionary<string, IPricingPolicy> policies = new()
+{
+    ["regular"] = new DiscountPricingPolicy(RegularPatientRate),
+    ["insured"] = new DiscountPricingPolicy(InsuredPatientRate),
+    ["staff"] = new DiscountPricingPolicy(StaffRate),
+};
+
+string patientType = "regular";
+IPricingPolicy pricing = policies.TryGetValue(patientType, out IPricingPolicy? found)
+    ? found
+    : new StandardPricingPolicy();
 TextWriterNotifier notifier = new(Console.Out);
 AppointmentService service = new(repository, pricing, notifier);
 
