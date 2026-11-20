@@ -12,6 +12,7 @@
 | `Appointment` | документ зі станом (запис на прийом) | ні, агрегат | `Id > 0`; `PatientId > 0`; `DoctorCode` непорожній; послуги додаються лише у станах `Scheduled` і `Confirmed`; із закритого стану (`Completed`, `Missed`, `Cancelled`) виходу немає |
 | `Patient` | довідник учасників | так, `sealed record` | `Id > 0`; `FullName` непорожнє; `Email` містить `@` |
 | `Doctor` | довідник об'єктів обліку | так, `sealed record` | `Code` і `FullName` непорожні; `ConsultationFee > 0`; `SlotMinutes > 0` |
+| `ArchivedAppointment` | архівний запис (додано в завданні 6) | так, обгортка без методів зміни | в архів потрапляє лише закритий запис |
 
 Чому так:
 
