@@ -7,18 +7,6 @@ namespace ClinicReception.Core.Domain;
 /// </summary>
 public class Visit
 {
-    /// <summary>Стан: візит заплановано.</summary>
-    public const int StatusScheduled = 0;
-
-    /// <summary>Стан: пацієнт підтвердив візит.</summary>
-    public const int StatusConfirmed = 1;
-
-    /// <summary>Стан: візит завершено.</summary>
-    public const int StatusCompleted = 2;
-
-    /// <summary>Стан: візит скасовано.</summary>
-    public const int StatusCancelled = 3;
-
     /// <summary>Ставка податку на додану вартість.</summary>
     private const decimal VatRate = 0.2m;
 
@@ -46,6 +34,14 @@ public class Visit
     /// <summary>Найкоротше допустиме прізвище пацієнта, символів.</summary>
     private const int MinPatientNameLength = 3;
 
+    /// <summary>Дозволені переходи стану: пара «поточний стан — новий стан».</summary>
+    private static readonly HashSet<(VisitStatus From, VisitStatus To)> AllowedTransitions = new()
+    {
+        (VisitStatus.Scheduled, VisitStatus.Confirmed),
+        (VisitStatus.Confirmed, VisitStatus.Completed),
+        (VisitStatus.Scheduled, VisitStatus.Cancelled),
+    };
+
     private readonly List<string[]> _lines = new List<string[]>();
 
     /// <summary>
@@ -53,8 +49,11 @@ public class Visit
     /// </summary>
     /// <param name="id">Номер візиту, наприклад «V-1001».</param>
     /// <param name="patientName">Прізвище пацієнта.</param>
+    /// <exception cref="ArgumentException">Номер або прізвище порожні.</exception>
     public Visit(string id, string patientName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(patientName);
         Id = id;
         PatientName = patientName;
         CreatedAt = DateTimeOffset.Now;
@@ -71,14 +70,20 @@ public class Visit
     public string PatientName { get; private set; }
 
     /// <summary>
-    /// Код стану візиту.
+    /// Стан візиту в його життєвому циклі.
     /// </summary>
-    public int Status { get; private set; } = StatusScheduled;
+    public VisitStatus Status { get; private set; } = VisitStatus.Scheduled;
 
     /// <summary>
     /// Момент створення візиту.
     /// </summary>
     public DateTimeOffset CreatedAt { get; private set; }
+
+    private bool HasPatientName => PatientName.Length >= MinPatientNameLength;
+
+    private bool HasAllowedLineCount => _lines.Count > 0 && _lines.Count < MaxLineCount;
+
+    private bool HasKnownStatus => Enum.IsDefined(Status);
 
     /// <summary>
     /// Шукає візит за номером.
@@ -86,8 +91,12 @@ public class Visit
     /// <param name="visits">Список візитів, у якому виконується пошук.</param>
     /// <param name="visitId">Номер шуканого візиту.</param>
     /// <returns>Знайдений візит або null, якщо візиту з таким номером немає.</returns>
+    /// <exception cref="ArgumentNullException">Список не передано.</exception>
+    /// <exception cref="ArgumentException">Номер шуканого візиту порожній.</exception>
     public static Visit? FindById(List<Visit> visits, string visitId)
     {
+        ArgumentNullException.ThrowIfNull(visits);
+        ArgumentException.ThrowIfNullOrWhiteSpace(visitId);
         for (int i = 0; i < visits.Count; i++)
         {
             if (visits[i].Id == visitId)
@@ -105,8 +114,13 @@ public class Visit
     /// <param name="serviceCode">Код послуги за прайсом клініки.</param>
     /// <param name="quantity">Кількість одиниць послуги.</param>
     /// <param name="unitPrice">Ціна за одиницю без ПДВ, грн.</param>
+    /// <exception cref="ArgumentException">Код послуги порожній.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Кількість не додатна або ціна від'ємна.</exception>
     public void AddLine(string serviceCode, int quantity, decimal unitPrice)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(serviceCode);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        ArgumentOutOfRangeException.ThrowIfNegative(unitPrice);
         string[] line = new string[3];
         line[0] = serviceCode;
         line[1] = quantity.ToString(CultureInfo.CurrentCulture);
@@ -121,35 +135,13 @@ public class Visit
     /// <returns>Сума до сплати, грн, заокруглена до двох знаків.</returns>
     public decimal CalculateTotal(bool hasInsurance)
     {
-        decimal total = 0;
-        int lineCount = 0;
-        for (int i = 0; i < _lines.Count; i++)
-        {
-            int quantity = int.Parse(_lines[i][1], CultureInfo.CurrentCulture);
-            decimal unitPrice = decimal.Parse(_lines[i][2], CultureInfo.CurrentCulture);
-            total += quantity * unitPrice;
-            lineCount++;
-        }
-
-        // знижки не підсумовуються: страхова має пріоритет над знижкою за великий чек
-        if (hasInsurance && total > InsuranceDiscountThreshold)
-        {
-            total *= 1m - InsuranceDiscountRate;
-        }
-        else if (total > LargeVisitThreshold)
-        {
-            total *= 1m - LargeVisitDiscountRate;
-        }
-
-        if (lineCount > BulkLineCount)
+        decimal total = DiscountedOf(SubtotalOf(), hasInsurance);
+        if (_lines.Count > BulkLineCount)
         {
             total -= BulkDiscountAmount;
         }
 
-        if (total < 0)
-        {
-            total = 0;
-        }
+        total = Math.Max(total, 0m);
 
         // ПДВ нараховується на суму вже після всіх знижок
         total += total * VatRate;
@@ -159,53 +151,27 @@ public class Visit
     /// <summary>
     /// Змінює стан візиту, якщо перехід дозволений правилами реєстратури.
     /// </summary>
-    /// <param name="newStatus">Код цільового стану візиту (константа Status…).</param>
+    /// <param name="newStatus">Цільовий стан візиту.</param>
     /// <returns>
     /// true, якщо перехід виконано; false, якщо він заборонений
     /// і стан візиту лишився попереднім.
     /// </returns>
-    public bool TryChangeStatus(int newStatus)
+    public bool TryChangeStatus(VisitStatus newStatus)
     {
-        if (Status == StatusScheduled && newStatus == StatusConfirmed)
+        if (!AllowedTransitions.Contains((Status, newStatus)))
         {
-            Status = StatusConfirmed;
-            return true;
+            return false;
         }
 
-        if (Status == StatusConfirmed && newStatus == StatusCompleted)
-        {
-            Status = StatusCompleted;
-            return true;
-        }
-
-        if (Status == StatusScheduled && newStatus == StatusCancelled)
-        {
-            Status = StatusCancelled;
-            return true;
-        }
-
-        return false;
+        Status = newStatus;
+        return true;
     }
 
     /// <summary>
     /// Перевіряє, чи заповнено візит достатньо для обліку.
     /// </summary>
-    /// <returns>true, якщо номер, пацієнт, послуги й стан коректні.</returns>
-    public bool IsValid()
-    {
-        if (Id is not null && Id.Length > 0
-            && PatientName is not null
-            && PatientName.Length >= MinPatientNameLength
-            && _lines.Count > 0
-            && _lines.Count < MaxLineCount
-            && Status >= StatusScheduled
-            && Status <= StatusCancelled)
-        {
-            return true;
-        }
-
-        return false;
-    }
+    /// <returns>true, якщо прізвище пацієнта, кількість послуг і стан коректні.</returns>
+    public bool IsValid() => HasPatientName && HasAllowedLineCount && HasKnownStatus;
 
     /// <summary>
     /// Формує текстовий звіт про послуги візиту.
@@ -228,5 +194,40 @@ public class Visit
 
         report = report + "Разом: " + CalculateTotal(false) + "\n";
         return report;
+    }
+
+    /// <summary>Застосовує одну зі знижок: страхову або за великий чек.</summary>
+    /// <param name="total">Сума послуг без знижок, грн.</param>
+    /// <param name="hasInsurance">Ознака пацієнта зі страховим полісом.</param>
+    /// <returns>Сума після знижки, грн.</returns>
+    private static decimal DiscountedOf(decimal total, bool hasInsurance)
+    {
+        // знижки не підсумовуються: страхова має пріоритет над знижкою за великий чек
+        if (hasInsurance && total > InsuranceDiscountThreshold)
+        {
+            return total * (1m - InsuranceDiscountRate);
+        }
+
+        if (total > LargeVisitThreshold)
+        {
+            return total * (1m - LargeVisitDiscountRate);
+        }
+
+        return total;
+    }
+
+    /// <summary>Обчислює суму послуг візиту без знижок і ПДВ.</summary>
+    /// <returns>Сума добутків кількості на ціну за всіма рядками, грн.</returns>
+    private decimal SubtotalOf()
+    {
+        decimal subtotal = 0;
+        foreach (string[] line in _lines)
+        {
+            int quantity = int.Parse(line[1], CultureInfo.CurrentCulture);
+            decimal unitPrice = decimal.Parse(line[2], CultureInfo.CurrentCulture);
+            subtotal += quantity * unitPrice;
+        }
+
+        return subtotal;
     }
 }

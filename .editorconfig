@@ -41,6 +41,14 @@ dotnet_naming_symbols.const_field.applicable_kinds = field
 dotnet_naming_symbols.const_field.required_modifiers = const
 dotnet_naming_style.pascal.capitalization = pascal_case
 
+# іменування: статичні поля лише для читання (таблиці правил) — PascalCase, як і
+# константи (N7); узгоджено з правилом StyleCop SA1311
+dotnet_naming_rule.static_readonly_pascal.symbols = static_readonly_field
+dotnet_naming_rule.static_readonly_pascal.style = pascal
+dotnet_naming_rule.static_readonly_pascal.severity = warning
+dotnet_naming_symbols.static_readonly_field.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_field.required_modifiers = static, readonly
+
 # іменування: приватні поля з підкресленням
 dotnet_naming_rule.priv_underscore.symbols = priv_field
 dotnet_naming_rule.priv_underscore.style = underscore_camel
@@ -87,3 +95,9 @@ dotnet_diagnostic.SA1503.severity = warning
 dotnet_diagnostic.SA1516.severity = warning
 # загальне форматування коду (те саме, що перевіряє dotnet format)
 dotnet_diagnostic.IDE0055.severity = warning
+
+[tests/**.cs]
+# імена тестів за схемою Метод_Умова_Результат (N13) містять підкреслення
+dotnet_diagnostic.CA1707.severity = none
+# тести не є публічним API: поведінку описує ім'я тесту, XML-документація зайва
+dotnet_diagnostic.SA1600.severity = none

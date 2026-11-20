@@ -1,6 +1,6 @@
 # Стандарт кодування проєкту ClinicReception
 
-Версія 1.1 · листопад 2026
+Версія 1.2 · листопад 2026
 
 ## 1. Загальні положення
 
@@ -29,7 +29,7 @@
 | N4 | Властивість | PascalCase, іменник | `StartTime` | `GetStartTime` |
 | N5 | Приватне поле [авто] | `_` + camelCase | `_items` | `m_Items`, `items` |
 | N6 | Локальна змінна, параметр | camelCase | `endTime` | `et`, `EndTime` |
-| N7 | Константа [авто] | PascalCase | `MaxSlotsPerDay` | `MAX_SLOTS` |
+| N7 | Константа, статичне поле лише для читання [авто] | PascalCase | `MaxSlotsPerDay`, `AllowedTransitions` | `MAX_SLOTS`, `_allowedTransitions` |
 | N8 | Перелічення | PascalCase, однина | `VisitStatus` | `VisitStatuses` |
 | N9 | Булеве значення | префікс `Is`/`Has`/`Can` | `HasInsurance` | `Insurance` |
 
@@ -41,6 +41,10 @@
   прийому, тож прийом 09:30–10:05 і наступний з 10:05 не перетинаються.
 - **N12.** Імена методів-запитів не мають побічних ефектів і не починаються з
   `Set`/`Update`; `Total()` лише рахує, але нічого не змінює.
+- **N13.** Тестовий метод називається за схемою `Метод_Умова_Результат`
+  (`Calculate_NoItems_ThrowsArgument`), тестовий клас — `<Тип>Tests`. Підкреслення
+  в іменах тестів дозволені лише в проєкті тестів (правило CA1707 вимкнено
+  для теки `tests`).
 
 ## 3. Форматування
 
@@ -99,6 +103,8 @@ bool overlaps = start < other.EndTime && other.StartTime < end;
 - **S5.** Стан запису — лише перелічення `VisitStatus`, а не рядок чи число.
 - **S6.** Числа, що мають зміст у предметній області (тривалість слота,
   межа робочого дня), — іменовані константи, а не «магічні» літерали.
+- **S7.** Проєкти застосунку лежать у теці `src`, модульні тести — у
+  `tests/ClinicReception.Tests`; проєкт тестів посилається на `Core`, а не навпаки.
 
 ## 6. Правила комітів
 
@@ -136,6 +142,7 @@ bool overlaps = start < other.EndTime && other.StartTime < end;
 | N2 Префікс `I` в інтерфейсі | аналізатор іменування | `dotnet_naming_rule.interface_prefix`, `IDE1006` |
 | N5 Приватне поле з `_` | аналізатор іменування | `dotnet_naming_rule.priv_underscore`, `IDE1006` |
 | N7 Константа PascalCase | аналізатор іменування | `dotnet_naming_rule.const_pascal`, `IDE1006` |
+| N7 Статичне readonly-поле PascalCase | аналізатор іменування | `dotnet_naming_rule.static_readonly_pascal`, `SA1311` |
 | C2 XML-документація | компілятор, StyleCop | `GenerateDocumentationFile` (CS1591), `SA1600` |
 | G3 Попередження = помилки | файли `.csproj` | `TreatWarningsAsErrors` |
 | G3 Нуль попереджень | `Directory.Build.props` | `EnforceCodeStyleInBuild`, `AnalysisLevel` |
