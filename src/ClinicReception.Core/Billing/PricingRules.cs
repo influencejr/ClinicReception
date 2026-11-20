@@ -42,6 +42,9 @@ public static class PricingRules
     /// <summary>Сума візиту, з якої реєстраційний збір не стягується, грн.</summary>
     public const decimal FreeRegistrationFrom = 1000m;
 
+    /// <summary>Кількість знаків після коми в підсумку: заокруглення до копійок.</summary>
+    public const int MoneyDecimalPlaces = 2;
+
     /// <summary>Промокод профілактичного огляду.</summary>
     public const string CheckupPromoCode = "CHECKUP10";
 
