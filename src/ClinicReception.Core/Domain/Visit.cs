@@ -46,6 +46,14 @@ public class Visit
     /// <summary>Найкоротше допустиме прізвище пацієнта, символів.</summary>
     private const int MinPatientNameLength = 3;
 
+    /// <summary>Дозволені переходи стану: пара «поточний стан — новий стан».</summary>
+    private static readonly HashSet<(int From, int To)> AllowedTransitions = new()
+    {
+        (StatusScheduled, StatusConfirmed),
+        (StatusConfirmed, StatusCompleted),
+        (StatusScheduled, StatusCancelled),
+    };
+
     private readonly List<string[]> _lines = new List<string[]>();
 
     /// <summary>
@@ -79,6 +87,15 @@ public class Visit
     /// Момент створення візиту.
     /// </summary>
     public DateTimeOffset CreatedAt { get; private set; }
+
+    private bool HasId => !string.IsNullOrEmpty(Id);
+
+    private bool HasPatientName =>
+        PatientName is not null && PatientName.Length >= MinPatientNameLength;
+
+    private bool HasAllowedLineCount => _lines.Count > 0 && _lines.Count < MaxLineCount;
+
+    private bool HasKnownStatus => Status >= StatusScheduled && Status <= StatusCancelled;
 
     /// <summary>
     /// Шукає візит за номером.
@@ -121,35 +138,13 @@ public class Visit
     /// <returns>Сума до сплати, грн, заокруглена до двох знаків.</returns>
     public decimal CalculateTotal(bool hasInsurance)
     {
-        decimal total = 0;
-        int lineCount = 0;
-        for (int i = 0; i < _lines.Count; i++)
-        {
-            int quantity = int.Parse(_lines[i][1], CultureInfo.CurrentCulture);
-            decimal unitPrice = decimal.Parse(_lines[i][2], CultureInfo.CurrentCulture);
-            total += quantity * unitPrice;
-            lineCount++;
-        }
-
-        // знижки не підсумовуються: страхова має пріоритет над знижкою за великий чек
-        if (hasInsurance && total > InsuranceDiscountThreshold)
-        {
-            total *= 1m - InsuranceDiscountRate;
-        }
-        else if (total > LargeVisitThreshold)
-        {
-            total *= 1m - LargeVisitDiscountRate;
-        }
-
-        if (lineCount > BulkLineCount)
+        decimal total = DiscountedOf(SubtotalOf(), hasInsurance);
+        if (_lines.Count > BulkLineCount)
         {
             total -= BulkDiscountAmount;
         }
 
-        if (total < 0)
-        {
-            total = 0;
-        }
+        total = Math.Max(total, 0m);
 
         // ПДВ нараховується на суму вже після всіх знижок
         total += total * VatRate;
@@ -166,46 +161,20 @@ public class Visit
     /// </returns>
     public bool TryChangeStatus(int newStatus)
     {
-        if (Status == StatusScheduled && newStatus == StatusConfirmed)
+        if (!AllowedTransitions.Contains((Status, newStatus)))
         {
-            Status = StatusConfirmed;
-            return true;
+            return false;
         }
 
-        if (Status == StatusConfirmed && newStatus == StatusCompleted)
-        {
-            Status = StatusCompleted;
-            return true;
-        }
-
-        if (Status == StatusScheduled && newStatus == StatusCancelled)
-        {
-            Status = StatusCancelled;
-            return true;
-        }
-
-        return false;
+        Status = newStatus;
+        return true;
     }
 
     /// <summary>
     /// Перевіряє, чи заповнено візит достатньо для обліку.
     /// </summary>
     /// <returns>true, якщо номер, пацієнт, послуги й стан коректні.</returns>
-    public bool IsValid()
-    {
-        if (Id is not null && Id.Length > 0
-            && PatientName is not null
-            && PatientName.Length >= MinPatientNameLength
-            && _lines.Count > 0
-            && _lines.Count < MaxLineCount
-            && Status >= StatusScheduled
-            && Status <= StatusCancelled)
-        {
-            return true;
-        }
-
-        return false;
-    }
+    public bool IsValid() => HasId && HasPatientName && HasAllowedLineCount && HasKnownStatus;
 
     /// <summary>
     /// Формує текстовий звіт про послуги візиту.
@@ -228,5 +197,40 @@ public class Visit
 
         report = report + "Разом: " + CalculateTotal(false) + "\n";
         return report;
+    }
+
+    /// <summary>Застосовує одну зі знижок: страхову або за великий чек.</summary>
+    /// <param name="total">Сума послуг без знижок, грн.</param>
+    /// <param name="hasInsurance">Ознака пацієнта зі страховим полісом.</param>
+    /// <returns>Сума після знижки, грн.</returns>
+    private static decimal DiscountedOf(decimal total, bool hasInsurance)
+    {
+        // знижки не підсумовуються: страхова має пріоритет над знижкою за великий чек
+        if (hasInsurance && total > InsuranceDiscountThreshold)
+        {
+            return total * (1m - InsuranceDiscountRate);
+        }
+
+        if (total > LargeVisitThreshold)
+        {
+            return total * (1m - LargeVisitDiscountRate);
+        }
+
+        return total;
+    }
+
+    /// <summary>Обчислює суму послуг візиту без знижок і ПДВ.</summary>
+    /// <returns>Сума добутків кількості на ціну за всіма рядками, грн.</returns>
+    private decimal SubtotalOf()
+    {
+        decimal subtotal = 0;
+        foreach (string[] line in _lines)
+        {
+            int quantity = int.Parse(line[1], CultureInfo.CurrentCulture);
+            decimal unitPrice = decimal.Parse(line[2], CultureInfo.CurrentCulture);
+            subtotal += quantity * unitPrice;
+        }
+
+        return subtotal;
     }
 }
