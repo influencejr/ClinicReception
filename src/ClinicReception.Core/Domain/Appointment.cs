@@ -31,7 +31,12 @@ public sealed class Appointment
 
     /// <summary>Додає послугу до запису.</summary>
     /// <param name="item">Послуга, яку отримає пацієнт під час прийому.</param>
-    public void AddItem(VisitItem item) => _items.Add(item);
+    /// <exception cref="ArgumentNullException">Послугу не передано.</exception>
+    public void AddItem(VisitItem item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        _items.Add(item);
+    }
 
     /// <summary>Обчислює вартість прийому.</summary>
     /// <returns>Сума за всіма послугами запису, грн.</returns>
