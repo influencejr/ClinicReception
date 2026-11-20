@@ -13,10 +13,10 @@ public class VisitGuardsTests
     }
 
     [Fact]
-    public void EnsureItemValid_ZeroQuantity_ThrowsOutOfRange()
+    public void EnsureItemsValid_NullItem_ThrowsArgumentNull()
     {
-        VisitItem item = new() { ServiceCode = "CONS-01", Quantity = 0, UnitPrice = 10m };
+        List<VisitItem> items = new() { new("CONS-01", 1, 250m, 20), null! };
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => VisitGuards.EnsureItemValid(item));
+        Assert.Throws<ArgumentNullException>(() => VisitGuards.EnsureItemsValid(items));
     }
 }

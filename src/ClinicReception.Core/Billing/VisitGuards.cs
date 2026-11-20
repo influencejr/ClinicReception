@@ -25,22 +25,13 @@ internal static class VisitGuards
         }
     }
 
-    /// <summary>Перевіряє одну послугу візиту.</summary>
-    /// <param name="item">Послуга з непорожнім кодом, додатною кількістю й невід'ємною ціною.</param>
-    /// <exception cref="ArgumentNullException">Послугу не передано.</exception>
-    /// <exception cref="ArgumentException">Код послуги порожній.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Кількість не додатна або ціна від'ємна.</exception>
-    public static void EnsureItemValid(VisitItem item)
-    {
-        ArgumentNullException.ThrowIfNull(item);
-        ArgumentException.ThrowIfNullOrWhiteSpace(item.ServiceCode);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(item.Quantity, nameof(item.Quantity));
-        ArgumentOutOfRangeException.ThrowIfNegative(item.UnitPrice, nameof(item.UnitPrice));
-    }
-
     /// <summary>Перевіряє перелік послуг візиту.</summary>
-    /// <param name="items">Непорожній перелік коректних послуг.</param>
-    /// <exception cref="ArgumentNullException">Перелік не передано.</exception>
+    /// <remarks>
+    /// Кожну послугу окремо не перевіряємо: <see cref="VisitItem"/> перевіряє
+    /// свої інваріанти в конструкторі, тож некоректна послуга не може існувати.
+    /// </remarks>
+    /// <param name="items">Непорожній перелік послуг.</param>
+    /// <exception cref="ArgumentNullException">Перелік не передано або в ньому є null.</exception>
     /// <exception cref="ArgumentException">Перелік порожній.</exception>
     public static void EnsureItemsValid(IReadOnlyList<VisitItem> items)
     {
@@ -52,7 +43,7 @@ internal static class VisitGuards
 
         foreach (VisitItem item in items)
         {
-            EnsureItemValid(item);
+            ArgumentNullException.ThrowIfNull(item, nameof(items));
         }
     }
 
