@@ -5,20 +5,28 @@ public sealed class Appointment
 {
     private readonly List<VisitItem> _items = new();
 
+    /// <summary>Номер запису на прийом.</summary>
     public int Id { get; init; }
 
+    /// <summary>Ідентифікатор пацієнта, якого записано.</summary>
     public int PatientId { get; init; }
 
+    /// <summary>Код лікаря, до якого записано пацієнта.</summary>
     public string DoctorCode { get; init; } = string.Empty;
 
+    /// <summary>Дата прийому.</summary>
     public DateOnly VisitDate { get; init; }
 
+    /// <summary>Час початку прийому.</summary>
     public TimeOnly StartTime { get; init; }
 
+    /// <summary>Поточний стан запису.</summary>
     public VisitStatus Status { get; set; } = VisitStatus.Scheduled;
 
+    /// <summary>Момент створення запису в реєстратурі.</summary>
     public DateTimeOffset CreatedAt { get; init; }
 
+    /// <summary>Послуги, які отримає пацієнт під час прийому.</summary>
     public IReadOnlyList<VisitItem> Items => _items;
 
     /// <summary>Додає послугу до запису.</summary>
