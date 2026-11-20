@@ -19,24 +19,24 @@ public static class LegacyVisitProcessor
         for (int i = 0; i < items.Count; i++)
         {
             decimal sum = items[i].Quantity * items[i].UnitPrice;
-            if (items[i].Quantity >= 10)
-                sum = sum * 0.95m;
+            if (items[i].Quantity >= PricingRules.BulkQuantity)
+                sum -= sum * PricingRules.BulkRate;
             total = total + sum;
         }
         if (isRegular)
-            total = total * 0.93m;
-        if (total > 5000)
-            total = total * 0.9m;
-        else if (total > 2000)
-            total = total * 0.95m;
-        if (promoCode == "CHECKUP10")
-            total = total - total * 0.1m;
-        else if (promoCode == "MINUS200" && total > 1000)
-            total = total - 200;
+            total -= total * PricingRules.RegularPatientRate;
+        if (total > PricingRules.LargeVisitFrom)
+            total -= total * PricingRules.LargeVisitRate;
+        else if (total > PricingRules.MediumVisitFrom)
+            total -= total * PricingRules.MediumVisitRate;
+        if (promoCode == PricingRules.CheckupPromoCode)
+            total -= total * PricingRules.CheckupPromoRate;
+        else if (promoCode == PricingRules.FixedPromoCode && total > PricingRules.FixedPromoFrom)
+            total -= PricingRules.FixedPromoAmount;
         if (visitDate.DayOfWeek == DayOfWeek.Sunday)
-            total = total * 0.98m;
-        if (total < 1000)
-            total = total + registrationFee;
+            total -= total * PricingRules.SundayRate;
+        if (total < PricingRules.FreeRegistrationFrom)
+            total += registrationFee;
         if (total < 0)
             total = 0;
         total = Math.Round(total, 2);
