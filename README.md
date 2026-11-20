@@ -12,8 +12,8 @@
 
 ## Склад рішення
 
-- `ClinicReception.Core` — логіка предметної області (бібліотека класів).
-- `ClinicReception.App` — консольний застосунок (введення й виведення).
+- `src/ClinicReception.Core` — логіка предметної області (бібліотека класів).
+- `src/ClinicReception.App` — консольний застосунок (введення й виведення).
 - `docs/lab02` — еталонний вивід застосунку до і після приведення коду
   до стандарту.
 
@@ -27,7 +27,7 @@
 git clone https://github.com/influencejr/ClinicReception.git
 cd ClinicReception
 dotnet build
-dotnet run --project ClinicReception.App
+dotnet run --project src/ClinicReception.App
 ```
 
 ## Стандарт кодування

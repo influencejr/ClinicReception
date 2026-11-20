@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicReception.Core", "ClinicReception.Core\ClinicReception.Core.csproj", "{2951851D-EABE-4884-80A2-06B136523A50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicReception.Core", "src\ClinicReception.Core\ClinicReception.Core.csproj", "{2951851D-EABE-4884-80A2-06B136523A50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicReception.App", "ClinicReception.App\ClinicReception.App.csproj", "{D709D2F5-E549-4779-9FA4-72ABD62FCFCD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicReception.App", "src\ClinicReception.App\ClinicReception.App.csproj", "{D709D2F5-E549-4779-9FA4-72ABD62FCFCD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
