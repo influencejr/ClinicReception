@@ -1,6 +1,6 @@
 # Стандарт кодування проєкту ClinicReception
 
-Версія 1.0 · листопад 2026
+Версія 1.1 · листопад 2026
 
 ## 1. Загальні положення
 
@@ -29,7 +29,7 @@
 | N4 | Властивість | PascalCase, іменник | `StartTime` | `GetStartTime` |
 | N5 | Приватне поле 🔧 | `_` + camelCase | `_items` | `m_Items`, `items` |
 | N6 | Локальна змінна, параметр | camelCase | `endTime` | `et`, `EndTime` |
-| N7 | Константа | PascalCase | `MaxSlotsPerDay` | `MAX_SLOTS` |
+| N7 | Константа 🔧 | PascalCase | `MaxSlotsPerDay` | `MAX_SLOTS` |
 | N8 | Перелічення | PascalCase, однина | `VisitStatus` | `VisitStatuses` |
 | N9 | Булеве значення | префікс `Is`/`Has`/`Can` | `HasInsurance` | `Insurance` |
 
@@ -74,9 +74,12 @@ minutes += item.Quantity * item.DurationMinutes;
 bool overlaps = start < other.EndTime && other.StartTime < end;
 ```
 
-- **C2.** Кожен публічний тип і метод бібліотеки `Core` має XML-коментар
-  `<summary>`; метод із параметрами — `<param>`, метод, що повертає значення, —
-  `<returns>`. Обов'язковість для властивостей — з ЛР № 4.
+- **C2.** 🔧 Кожен публічний член бібліотеки `Core` — тип, конструктор, властивість,
+  метод, константа, член перелічення — має XML-коментар `<summary>`; метод із
+  параметрами — `<param>`, метод, що повертає значення, — `<returns>`; метод-спроба
+  пояснює, що означає `false`. Контроль — `GenerateDocumentationFile` (CS1591) і
+  StyleCop `SA1600` (з ЛР № 2). Шаблони `Gets…`/`Initializes…` (SA1623, SA1642) не
+  вимагаються, бо документація пишеться українською (C3).
 - **C3.** Мова коментарів і повідомлень користувачу — українська; мова
   ідентифікаторів — англійська.
 - **C4.** Закоментований код у репозиторії заборонений: історію зберігає Git.
@@ -132,6 +135,9 @@ bool overlaps = start < other.EndTime && other.StartTime < end;
 | F9 Пробіли в кінці рядка | `.editorconfig`, StyleCop | `trim_trailing_whitespace`, `SA1028` |
 | N2 Префікс `I` в інтерфейсі | аналізатор іменування | `dotnet_naming_rule.interface_prefix`, `IDE1006` |
 | N5 Приватне поле з `_` | аналізатор іменування | `dotnet_naming_rule.priv_underscore`, `IDE1006` |
+| N7 Константа PascalCase | аналізатор іменування | `dotnet_naming_rule.const_pascal`, `IDE1006` |
+| C2 XML-документація | компілятор, StyleCop | `GenerateDocumentationFile` (CS1591), `SA1600` |
+| G3 Попередження = помилки | файли `.csproj` | `TreatWarningsAsErrors` |
 | G3 Нуль попереджень | `Directory.Build.props` | `EnforceCodeStyleInBuild`, `AnalysisLevel` |
 
 Перевірка всього стандарту однією послідовністю команд:
