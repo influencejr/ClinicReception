@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace ClinicReception.Core.Domain;
 
 /// <summary>
@@ -9,9 +5,46 @@ namespace ClinicReception.Core.Domain;
 /// </summary>
 public class Visit
 {
-    private readonly List<string[]> _lines = new List<string[]>();
+    /// <summary>Стан: візит заплановано.</summary>
+    public const int StatusScheduled = 0;
 
-    // public string prim;   // примітка, поки не треба
+    /// <summary>Стан: пацієнт підтвердив візит.</summary>
+    public const int StatusConfirmed = 1;
+
+    /// <summary>Стан: візит завершено.</summary>
+    public const int StatusCompleted = 2;
+
+    /// <summary>Стан: візит скасовано.</summary>
+    public const int StatusCancelled = 3;
+
+    /// <summary>Ставка податку на додану вартість.</summary>
+    private const decimal VatRate = 0.2m;
+
+    /// <summary>Поріг суми для знижки застрахованому пацієнту, грн.</summary>
+    private const decimal InsuranceDiscountThreshold = 1000m;
+
+    /// <summary>Частка знижки застрахованому пацієнту.</summary>
+    private const decimal InsuranceDiscountRate = 0.10m;
+
+    /// <summary>Поріг суми для знижки за великий чек, грн.</summary>
+    private const decimal LargeVisitThreshold = 5000m;
+
+    /// <summary>Частка знижки за великий чек.</summary>
+    private const decimal LargeVisitDiscountRate = 0.15m;
+
+    /// <summary>Кількість рядків послуг, понад яку діє фіксована знижка.</summary>
+    private const int BulkLineCount = 10;
+
+    /// <summary>Фіксована знижка за велику кількість послуг, грн.</summary>
+    private const decimal BulkDiscountAmount = 100m;
+
+    /// <summary>Межа кількості рядків послуг у візиті (не включно).</summary>
+    private const int MaxLineCount = 100;
+
+    /// <summary>Найкоротше допустиме прізвище пацієнта, символів.</summary>
+    private const int MinPatientNameLength = 3;
+
+    private readonly List<string[]> _lines = new List<string[]>();
 
     /// <summary>
     /// Створює візит у початковому стані.
@@ -38,7 +71,7 @@ public class Visit
     /// <summary>
     /// Код стану візиту.
     /// </summary>
-    public int Status { get; private set; } = 0; // 0-новий,1-підтв,2-заверш,3-скасов
+    public int Status { get; private set; } = StatusScheduled;
 
     /// <summary>
     /// Момент створення візиту.
@@ -92,28 +125,23 @@ public class Visit
         {
             int quantity = int.Parse(_lines[i][1]);
             decimal unitPrice = decimal.Parse(_lines[i][2]);
-            total = total + (quantity * unitPrice);
-            lineCount = lineCount + 1;
+            total += quantity * unitPrice;
+            lineCount++;
         }
 
-        // if (sum1 > 500) { sum1 = sum1 - 50; } // стара знижка
         // знижки не підсумовуються: страхова має пріоритет над знижкою за великий чек
-        if (hasInsurance == true && total > 1000)
+        if (hasInsurance && total > InsuranceDiscountThreshold)
         {
-            total = total * 0.9m;
+            total *= 1m - InsuranceDiscountRate;
         }
-        else if (total > 5000)
+        else if (total > LargeVisitThreshold)
         {
-            total = total * 0.85m;
-        }
-        else
-        {
-            total = total;
+            total *= 1m - LargeVisitDiscountRate;
         }
 
-        if (lineCount > 10)
+        if (lineCount > BulkLineCount)
         {
-            total = total - 100;
+            total -= BulkDiscountAmount;
         }
 
         if (total < 0)
@@ -122,35 +150,35 @@ public class Visit
         }
 
         // ПДВ нараховується на суму вже після всіх знижок
-        total = total + (total * 0.2m);
+        total += total * VatRate;
         return Math.Round(total, 2);
     }
 
     /// <summary>
     /// Змінює стан візиту, якщо перехід дозволений правилами реєстратури.
     /// </summary>
-    /// <param name="newStatus">Код цільового стану візиту.</param>
+    /// <param name="newStatus">Код цільового стану візиту (константа Status…).</param>
     /// <returns>
     /// true, якщо перехід виконано; false, якщо він заборонений
     /// і стан візиту лишився попереднім.
     /// </returns>
     public bool TryChangeStatus(int newStatus)
     {
-        if (Status == 0 && newStatus == 1)
+        if (Status == StatusScheduled && newStatus == StatusConfirmed)
         {
-            Status = 1;
+            Status = StatusConfirmed;
             return true;
         }
 
-        if (Status == 1 && newStatus == 2)
+        if (Status == StatusConfirmed && newStatus == StatusCompleted)
         {
-            Status = 2;
+            Status = StatusCompleted;
             return true;
         }
 
-        if (Status == 0 && newStatus == 3)
+        if (Status == StatusScheduled && newStatus == StatusCancelled)
         {
-            Status = 3;
+            Status = StatusCancelled;
             return true;
         }
 
@@ -165,11 +193,11 @@ public class Visit
     {
         if (Id is not null && Id.Length > 0
             && PatientName is not null
-            && PatientName.Length > 2
+            && PatientName.Length >= MinPatientNameLength
             && _lines.Count > 0
-            && _lines.Count < 100
-            && Status >= 0
-            && Status <= 3)
+            && _lines.Count < MaxLineCount
+            && Status >= StatusScheduled
+            && Status <= StatusCancelled)
         {
             return true;
         }
