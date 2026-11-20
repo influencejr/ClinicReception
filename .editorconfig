@@ -87,3 +87,7 @@ dotnet_diagnostic.SA1503.severity = warning
 dotnet_diagnostic.SA1516.severity = warning
 # загальне форматування коду (те саме, що перевіряє dotnet format)
 dotnet_diagnostic.IDE0055.severity = warning
+
+[tests/**.cs]
+# імена тестів за схемою Метод_Умова_Результат (N13) містять підкреслення
+dotnet_diagnostic.CA1707.severity = none
