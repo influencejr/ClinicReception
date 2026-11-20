@@ -42,7 +42,7 @@ public class Visit
         (VisitStatus.Scheduled, VisitStatus.Cancelled),
     };
 
-    private readonly List<string[]> _lines = new List<string[]>();
+    private readonly List<VisitLine> _lines = new();
 
     /// <summary>
     /// Створює візит у початковому стані.
@@ -121,11 +121,7 @@ public class Visit
         ArgumentException.ThrowIfNullOrWhiteSpace(serviceCode);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
         ArgumentOutOfRangeException.ThrowIfNegative(unitPrice);
-        string[] line = new string[3];
-        line[0] = serviceCode;
-        line[1] = quantity.ToString(CultureInfo.CurrentCulture);
-        line[2] = unitPrice.ToString(CultureInfo.CurrentCulture);
-        _lines.Add(line);
+        _lines.Add(new VisitLine(serviceCode, quantity, unitPrice));
     }
 
     /// <summary>
@@ -179,17 +175,15 @@ public class Visit
     /// <returns>Рядки з послугами та підсумок без страхової знижки.</returns>
     public string BuildReport()
     {
+        CultureInfo culture = CultureInfo.CurrentCulture;
         string report = string.Empty;
-        for (int i = 0; i < _lines.Count; i++)
+        foreach (VisitLine line in _lines)
         {
-            int quantity = int.Parse(_lines[i][1], CultureInfo.CurrentCulture);
-            decimal unitPrice = decimal.Parse(_lines[i][2], CultureInfo.CurrentCulture);
-            decimal lineAmount = quantity * unitPrice;
             report = report
-                + "Послуга: " + _lines[i][0]
-                + "; кількість: " + _lines[i][1]
-                + "; ціна: " + _lines[i][2]
-                + "; сума: " + lineAmount + "\n";
+                + "Послуга: " + line.ServiceCode
+                + "; кількість: " + line.Quantity.ToString(culture)
+                + "; ціна: " + line.UnitPrice.ToString(culture)
+                + "; сума: " + line.Amount.ToString(culture) + "\n";
         }
 
         report = report + "Разом: " + CalculateTotal(false) + "\n";
@@ -221,13 +215,21 @@ public class Visit
     private decimal SubtotalOf()
     {
         decimal subtotal = 0;
-        foreach (string[] line in _lines)
+        foreach (VisitLine line in _lines)
         {
-            int quantity = int.Parse(line[1], CultureInfo.CurrentCulture);
-            decimal unitPrice = decimal.Parse(line[2], CultureInfo.CurrentCulture);
-            subtotal += quantity * unitPrice;
+            subtotal += line.Amount;
         }
 
         return subtotal;
+    }
+
+    /// <summary>Рядок послуги візиту з типізованими кількістю й ціною.</summary>
+    /// <param name="ServiceCode">Код послуги за прайсом клініки.</param>
+    /// <param name="Quantity">Кількість одиниць послуги.</param>
+    /// <param name="UnitPrice">Ціна за одиницю без ПДВ, грн.</param>
+    private sealed record VisitLine(string ServiceCode, int Quantity, decimal UnitPrice)
+    {
+        /// <summary>Сума рядка: кількість × ціна, грн.</summary>
+        public decimal Amount => Quantity * UnitPrice;
     }
 }
