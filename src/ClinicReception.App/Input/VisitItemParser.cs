@@ -76,22 +76,4 @@ public static class VisitItemParser
 
         return Result<VisitItem>.Ok(new VisitItem(serviceCode.Trim().ToUpperInvariant(), count, unitPrice, duration));
     }
-
-    /// <summary>Рахує рядки з додатною кількістю.</summary>
-    /// <param name="rows">Кількості, як їх прочитано з файлу.</param>
-    /// <returns>Кількість коректних рядків.</returns>
-    public static int CountValidQuantities(string[] rows)
-    {
-        ArgumentNullException.ThrowIfNull(rows);
-        int valid = 0;
-        foreach (string row in rows)
-        {
-            if (int.TryParse(row, NumberStyles.None, CultureInfo.InvariantCulture, out int quantity) && quantity > 0)
-            {
-                valid++;
-            }
-        }
-
-        return valid;
-    }
 }

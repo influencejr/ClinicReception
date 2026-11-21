@@ -9,6 +9,7 @@ public class VersionInfoTests
     {
         string version = VersionInfo.Current();
 
-        Assert.Matches(@"^\d+\.\d+\.\d+$", version);
+        // SemVer дозволяє суфікс попередньої версії: 0.9.0-beta.1
+        Assert.Matches(@"^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$", version);
     }
 }
