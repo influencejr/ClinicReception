@@ -81,6 +81,9 @@ dotnet_diagnostic.SA1623.severity = none
 dotnet_diagnostic.SA1642.severity = none
 # кома в кінці багаторядкового ініціалізатора необов'язкова
 dotnet_diagnostic.SA1413.severity = none
+# CA1848 вимагає LoggerMessage-делегатів заради швидкодії; для консольного
+# застосунку з кількома записами на операцію це зайве, LogInformation читається простіше
+dotnet_diagnostic.CA1848.severity = none
 
 # правила, які лишаємо суворими
 # XML-документація обов'язкова для публічних членів (з ЛР № 2, C2)

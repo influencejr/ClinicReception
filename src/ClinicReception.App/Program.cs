@@ -1,5 +1,6 @@
 using System.Text;
 using ClinicReception.App.Input;
+using ClinicReception.App.Notifications;
 using ClinicReception.Core.Abstractions;
 using ClinicReception.Core.Billing;
 using ClinicReception.Core.Domain;
@@ -9,28 +10,43 @@ using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Reporting;
 using ClinicReception.Core.Services;
 using ClinicReception.Core.Storage;
+using Microsoft.Extensions.Logging;
 
 Console.OutputEncoding = Encoding.UTF8;
+
+// журнал іде в stderr, діалог з користувачем - у stdout, тож їх можна розділити
+using ILoggerFactory factory = LoggerFactory.Create(builder =>
+{
+    builder.AddSimpleConsole(options =>
+    {
+        options.TimestampFormat = "HH:mm:ss ";
+        options.IncludeScopes = true;
+        options.SingleLine = true;
+    });
+    builder.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
+    builder.SetMinimumLevel(LogLevel.Debug);
+});
+ILogger log = factory.CreateLogger("ClinicReception.App");
 
 // верхній обробник - єдине місце, де дозволено catch (Exception)
 try
 {
-    Run();
+    Run(factory);
     return 0;
 }
 catch (DomainRuleException ex)
 {
-    Console.Error.WriteLine($"Правило {ex.Rule}: {ex.Message}");
+    log.LogWarning("Правило {Rule}: {Message}", ex.Rule, ex.Message);
     return 1;
 }
 catch (Exception ex)
 {
-    Console.Error.WriteLine("Внутрішня помилка, роботу завершено.");
-    Console.Error.WriteLine(ex);
+    log.LogCritical(ex, "Непередбачений збій, роботу завершено");
+    Console.Error.WriteLine("Внутрішня помилка, подробиці в журналі.");
     return 2;
 }
 
-static void Run()
+static void Run(ILoggerFactory factory)
 {
     // ЛР 3: розрахунок вартості візиту
     TotalRequest request = BuildSampleRequest();
@@ -40,15 +56,27 @@ static void Run()
 
     // ЛР 4: композиційний корінь - єдине місце, де створюються конкретні реалізації
     InMemoryAppointmentRepository repository = new();
-    AppointmentService service = new(repository, PricingFor("regular"), new TextWriterNotifier(Console.Out));
+    ILogger<AppointmentService> serviceLog = factory.CreateLogger<AppointmentService>();
+    AppointmentService service = new(repository, PricingFor("regular"), new TextWriterNotifier(Console.Out), serviceLog);
 
-    Patient patient = new(10, "Іваненко Олена Петрівна", "o.ivanenko@example.com") { IsRegular = true };
+    Patient patient = new(10, "Іваненко Олена Петрівна", "o.ivanenko@example.com")
+    {
+        IsRegular = true,
+        Phone = "+380671234567",
+    };
     Appointment appointment = new(1, 10, "DOC-THER-01", new DateOnly(2026, 3, 10), new TimeOnly(9, 30));
     appointment.AddItem(new VisitItem("CONS-01", 1, 650m, 20));
     appointment.AddItem(new VisitItem("ECG-01", 1, 350m, 15));
     Console.WriteLine();
     service.Book(appointment, patient);
     Console.WriteLine($"Сума: {service.TotalOf(appointment):0.00}");
+
+    // ЛР 5: поштовий сервер недоступний - запис має зберегтися, а збій потрапити в журнал
+    AppointmentService offline = new(repository, PricingFor("insured"), new OfflineNotifier(), serviceLog);
+    Patient second = new(11, "Петренко Андрій Іванович", "a.petrenko@example.com") { HasInsurance = true };
+    Appointment secondVisit = new(2, 11, "DOC-CARD-02", new DateOnly(2026, 3, 10), new TimeOnly(11, 0));
+    secondVisit.AddItem(new VisitItem("CONS-02", 1, 800m, 30));
+    offline.Book(secondVisit, second);
 
     // ЛР 5: послуги вводяться з консолі й проходять через барикаду VisitItemParser
     Console.WriteLine();
