@@ -26,7 +26,7 @@ public class LegacyCharacterizationTests
         };
         LegacyAppointmentProcessor sut = new();
 
-        string actual = sut.Handle(1001, 7, "Іван", mail, PatientKind.Regular, 0, items, state, "UAH", new DateTime(2026, 3, 1), false);
+        string actual = sut.Handle(new VisitRequest(1001, PatientOf(PatientKind.Regular, 0, mail), items, state, "UAH", false));
 
         Assert.Equal(expected, actual);
     }
@@ -36,7 +36,7 @@ public class LegacyCharacterizationTests
     {
         LegacyAppointmentProcessor sut = new();
 
-        string report = sut.Handle(1001, 7, "Іван", "a@b.c", PatientKind.Vip, 3, TwoLines(), AppointmentState.New, "UAH", new DateTime(2026, 3, 1), false);
+        string report = sut.Handle(new VisitRequest(1001, PatientOf(PatientKind.Vip, 3), TwoLines(), AppointmentState.New, "UAH", false));
 
         string expected = "Документ #1001\n"
             + "Клієнт: Іван\n"
@@ -53,7 +53,7 @@ public class LegacyCharacterizationTests
     {
         LegacyAppointmentProcessor sut = new();
 
-        sut.Handle(1001, 7, "Іван", "a@b.c", PatientKind.Regular, 0, TwoLines(), AppointmentState.Paid, "UAH", new DateTime(2026, 3, 1), true);
+        sut.Handle(new VisitRequest(1001, PatientOf(PatientKind.Regular, 0), TwoLines(), AppointmentState.Paid, "UAH", true));
 
         Assert.Equal("ok 1001\nmail -> a@b.c\n", sut.DumpLog());
     }
@@ -67,7 +67,7 @@ public class LegacyCharacterizationTests
     {
         LegacyAppointmentProcessor sut = new();
 
-        decimal total = sut.Preview(kind, visits, TwoLines());
+        decimal total = sut.Preview(PatientOf(kind, visits), TwoLines());
 
         Assert.Equal(expected, total);
     }
@@ -80,7 +80,7 @@ public class LegacyCharacterizationTests
             new ServiceLine { Code = "MRI-01", Qty = 2, Price = 500m },
         };
 
-        decimal total = new LegacyAppointmentProcessor().Preview(PatientKind.Regular, 0, items);
+        decimal total = new LegacyAppointmentProcessor().Preview(PatientOf(PatientKind.Regular, 0), items);
 
         Assert.Equal(1000m, total);
     }
@@ -93,7 +93,7 @@ public class LegacyCharacterizationTests
             new ServiceLine { Code = "SURG-01", Qty = 1, Price = 2000m },
         };
 
-        decimal total = new LegacyAppointmentProcessor().Preview(PatientKind.Staff, 0, items);
+        decimal total = new LegacyAppointmentProcessor().Preview(PatientOf(PatientKind.Staff, 0), items);
 
         Assert.Equal(1500m, total);
     }
@@ -118,6 +118,15 @@ public class LegacyCharacterizationTests
 
         Assert.Equal(expected, actual);
     }
+
+    private static Patient PatientOf(PatientKind kind, int visits, string mail = "a@b.c") => new()
+    {
+        Id = 7,
+        Name = "Іван",
+        Email = mail,
+        Kind = kind,
+        VisitCount = visits,
+    };
 
     private static List<ServiceLine> TwoLines() => new()
     {
