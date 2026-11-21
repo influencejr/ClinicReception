@@ -4,86 +4,30 @@ namespace ClinicReception.Tests;
 
 public class VolumeDiscountTests
 {
-    [Fact]
-    public void VolumeDiscountOf_NegativeAmount_Throws()
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(1500, 0)]
+    [InlineData(2000, 0)]
+    [InlineData(2000.01, 100.0005)]
+    [InlineData(3000, 150)]
+    [InlineData(5000, 250)]
+    [InlineData(5000.01, 500.001)]
+    [InlineData(8000, 800)]
+    public void VolumeDiscountOf_Boundaries_MatchesTable(double amount, double expected)
     {
-        // Arrange
-        decimal amount = -0.01m;
+        decimal actual = VisitTotalCalculator.VolumeDiscountOf((decimal)amount);
 
-        // Act
-        Exception? error = Record.Exception(() => VisitTotalCalculator.VolumeDiscountOf(amount));
-
-        // Assert
-        Assert.IsType<ArgumentOutOfRangeException>(error);
+        Assert.Equal((decimal)expected, actual);
     }
 
-    [Fact]
-    public void VolumeDiscountOf_Zero_ReturnsZero()
+    [Theory]
+    [InlineData(-0.01)]
+    [InlineData(-1000)]
+    public void VolumeDiscountOf_NegativeAmount_ThrowsOutOfRange(double amount)
     {
-        decimal amount = 0m;
+        ArgumentOutOfRangeException error = Assert.Throws<ArgumentOutOfRangeException>(
+            () => VisitTotalCalculator.VolumeDiscountOf((decimal)amount));
 
-        decimal actual = VisitTotalCalculator.VolumeDiscountOf(amount);
-
-        Assert.Equal(0m, actual);
-    }
-
-    [Fact]
-    public void VolumeDiscountOf_ExactlyMediumThreshold_ReturnsZero()
-    {
-        decimal amount = 2000m;
-
-        decimal actual = VisitTotalCalculator.VolumeDiscountOf(amount);
-
-        Assert.Equal(0m, actual);
-    }
-
-    [Fact]
-    public void VolumeDiscountOf_JustAboveMediumThreshold_ReturnsFivePercent()
-    {
-        decimal amount = 2000.01m;
-
-        decimal actual = VisitTotalCalculator.VolumeDiscountOf(amount);
-
-        Assert.Equal(100.0005m, actual);
-    }
-
-    [Fact]
-    public void VolumeDiscountOf_MediumVisit_ReturnsFivePercent()
-    {
-        decimal amount = 3000m;
-
-        decimal actual = VisitTotalCalculator.VolumeDiscountOf(amount);
-
-        Assert.Equal(150m, actual);
-    }
-
-    [Fact]
-    public void VolumeDiscountOf_ExactlyLargeThreshold_ReturnsFivePercent()
-    {
-        decimal amount = 5000m;
-
-        decimal actual = VisitTotalCalculator.VolumeDiscountOf(amount);
-
-        Assert.Equal(250m, actual);
-    }
-
-    [Fact]
-    public void VolumeDiscountOf_JustAboveLargeThreshold_ReturnsTenPercent()
-    {
-        decimal amount = 5000.01m;
-
-        decimal actual = VisitTotalCalculator.VolumeDiscountOf(amount);
-
-        Assert.Equal(500.001m, actual);
-    }
-
-    [Fact]
-    public void VolumeDiscountOf_LargeVisit_ReturnsTenPercent()
-    {
-        decimal amount = 8000m;
-
-        decimal actual = VisitTotalCalculator.VolumeDiscountOf(amount);
-
-        Assert.Equal(800m, actual);
+        Assert.Equal("amount", error.ParamName);
     }
 }
