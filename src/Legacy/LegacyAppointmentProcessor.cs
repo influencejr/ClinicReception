@@ -26,6 +26,19 @@ public class Patient
     public PatientKind Kind = PatientKind.Regular;
     public int VisitCount;
     public DateTime SinceUtc;
+
+    public bool IsLoyal => VisitCount > PricingRules.LoyalVisits;
+
+    public string Describe()
+    {
+        string s = Name.Trim().ToUpper();
+        if (Kind == PatientKind.Vip) s += " [VIP]";
+        if (IsLoyal) s += " [ЛОЯЛЬНИЙ]";
+        s += " <" + Email.ToLower() + ">";
+        int years = DateTime.Now.Year - SinceUtc.Year;
+        s += " стаж " + years;
+        return s;
+    }
 }
 
 public class ServiceLine
@@ -110,17 +123,6 @@ public class LegacyAppointmentProcessor
         decimal subtotal = Subtotal(items);
         decimal payable = subtotal - _discounts.For(subtotal, patient);
         return payable + _shipping.For(payable);
-    }
-
-    public string DescribeClient(Patient c)
-    {
-        string s = c.Name.Trim().ToUpper();
-        if (c.Kind == PatientKind.Vip) s += " [VIP]";
-        if (c.VisitCount > PricingRules.LoyalVisits) s += " [ЛОЯЛЬНИЙ]";
-        s += " <" + c.Email.ToLower() + ">";
-        int years = DateTime.Now.Year - c.SinceUtc.Year;
-        s += " стаж " + years;
-        return s;
     }
 
     public string DumpLog()
