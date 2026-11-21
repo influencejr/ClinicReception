@@ -1,6 +1,7 @@
 using System.Text;
 using ClinicReception.App.Input;
 using ClinicReception.App.Notifications;
+using ClinicReception.Core;
 using ClinicReception.Core.Abstractions;
 using ClinicReception.Core.Billing;
 using ClinicReception.Core.Domain;
@@ -13,6 +14,7 @@ using ClinicReception.Core.Storage;
 using Microsoft.Extensions.Logging;
 
 Console.OutputEncoding = Encoding.UTF8;
+Console.WriteLine($"ClinicReception v{VersionInfo.Current()}");
 
 // журнал іде в stderr, діалог з користувачем - у stdout, тож їх можна розділити
 using ILoggerFactory factory = LoggerFactory.Create(builder =>
