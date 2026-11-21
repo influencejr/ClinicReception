@@ -1,5 +1,7 @@
 # ClinicReception
 
+![CI](https://github.com/influencejr/ClinicReception/actions/workflows/ci.yml/badge.svg)
+
 Навчальний проєкт з дисципліни «Конструювання програмного забезпечення».
 Варіант № 4: запис пацієнтів на прийом до лікаря.
 
@@ -87,6 +89,31 @@ reportgenerator -reports:"tests/**/coverage.cobertura.xml" -targetdir:coverage
 Ручні тестові дублери (фейк сховища, стаби політики цін і сповіщувача) лежать
 у `tests/ClinicReception.Tests/Doubles`.
 
+## Безперервна інтеграція
+
+Конвеєр `.github/workflows/ci.yml` запускається на кожен push у `main` і
+`feature/**` та на кожен pull request у `main`. Складання на сервері
+закріплено на .NET SDK 8. Зміна потрапляє в `main`, лише коли пройдено всі
+критерії якості:
+
+| Крок | Команда | Що ламає збірку |
+|---|---|---|
+| Формат | `dotnet format --verify-no-changes` | зайвий пробіл, відступ, порядок using |
+| Складання | `dotnet build -c Release` | будь-яке попередження CS, CA, SA, IDE або NU (вразливий пакет) |
+| Тести | `dotnet test -c Release` | хоча б один червоний тест |
+| Покриття | coverlet, `/p:Threshold=60` | покриття рядків будь-якого модуля нижче за 60 % |
+
+Те саме локально:
+
+```bash
+dotnet format --verify-no-changes
+dotnet build -c Release
+dotnet test -c Release /p:CollectCoverage=true /p:Threshold=60 /p:ThresholdType=line
+```
+
+Спільні властивості складання (версія, мова, аналізатори, аудит пакетів)
+задано в `Directory.Build.props`. Застосунок виводить версію першим рядком.
+
 ## Стандарт кодування
 
 Правила описано у файлі [CODING_STANDARD.md](CODING_STANDARD.md) і закріплено
@@ -109,6 +136,7 @@ dotnet build
 | ЛР № 5 | Обробка помилок, винятків і логування | `lab5` |
 | ЛР № 6 | Рефакторинг успадкованого коду за каталогом рефакторингів | `lab6` |
 | ЛР № 7 | Модульне тестування та розробка через тестування (TDD) | `lab7` |
+| ЛР № 8 | Складання, статичний аналіз і безперервна інтеграція | `v0.8.0` |
 
 ## Відомі обмеження
 

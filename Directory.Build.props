@@ -1,10 +1,23 @@
 <Project>
+  <!-- спільні властивості для всіх проєктів рішення, csproj містять лише своє -->
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
+    <!-- C# 12 іде з SDK 8, тож локально (SDK 10) і в CI мова однакова -->
+    <LangVersion>12.0</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <!-- набір правил зафіксовано на версії 8.0: latest на SDK 10 дав би правила,
+         яких немає в SDK 8 на сервері CI -->
     <AnalysisLevel>8.0-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <VersionPrefix>0.8.0</VersionPrefix>
+    <Authors>Вовк Давід</Authors>
+    <Product>ClinicReception</Product>
+    <!-- аудит пакетів під час restore, разом із транзитивними; через
+         TreatWarningsAsErrors вразливий пакет ламає складання -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
   </PropertyGroup>
 </Project>

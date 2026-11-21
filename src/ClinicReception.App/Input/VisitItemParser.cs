@@ -10,6 +10,18 @@ namespace ClinicReception.App.Input;
 /// </summary>
 public static class VisitItemParser
 {
+    /// <summary>Найдовший код послуги в прайсі клініки, символів.</summary>
+    public const int MaxCodeLength = 20;
+
+    /// <summary>Найбільша кількість однієї послуги в записі.</summary>
+    public const int MaxQuantity = 50;
+
+    /// <summary>Найвища ціна однієї послуги, грн.</summary>
+    public const decimal MaxPrice = 100_000m;
+
+    /// <summary>Найдовша послуга, хв (зміна лікаря).</summary>
+    public const int MaxMinutes = 480;
+
     /// <summary>
     /// Розбирає послугу, введену одним рядком: код, кількість, ціна, хвилини
     /// через пробіл, наприклад «LAB-02 1 180,50 10».
@@ -38,45 +50,30 @@ public static class VisitItemParser
     /// <returns>Послуга або пояснення, що введено не так.</returns>
     public static Result<VisitItem> Parse(string? serviceCode, string? quantity, string? price, string? minutes)
     {
-        if (string.IsNullOrWhiteSpace(serviceCode))
+        if (string.IsNullOrWhiteSpace(serviceCode) || serviceCode.Trim().Length > MaxCodeLength)
         {
-            return Result<VisitItem>.Fail("Код послуги порожній");
+            return Result<VisitItem>.Fail($"Код послуги — від 1 до {MaxCodeLength} символів");
         }
 
-        if (!int.TryParse(quantity, NumberStyles.None, CultureInfo.InvariantCulture, out int count) || count <= 0)
+        if (!int.TryParse(quantity, NumberStyles.None, CultureInfo.InvariantCulture, out int count)
+            || count is < 1 or > MaxQuantity)
         {
-            return Result<VisitItem>.Fail("Кількість — ціле число більше 0");
+            return Result<VisitItem>.Fail($"Кількість — ціле число від 1 до {MaxQuantity}");
         }
 
         string normalizedPrice = (price ?? string.Empty).Trim().Replace(',', '.');
-        if (!decimal.TryParse(normalizedPrice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal unitPrice))
+        if (!decimal.TryParse(normalizedPrice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal unitPrice)
+            || unitPrice > MaxPrice)
         {
-            return Result<VisitItem>.Fail("Ціна — невід'ємне число, наприклад 650,50");
+            return Result<VisitItem>.Fail($"Ціна — число від 0 до {MaxPrice:0}, наприклад 650,50");
         }
 
-        if (!int.TryParse(minutes, NumberStyles.None, CultureInfo.InvariantCulture, out int duration) || duration <= 0)
+        if (!int.TryParse(minutes, NumberStyles.None, CultureInfo.InvariantCulture, out int duration)
+            || duration is < 1 or > MaxMinutes)
         {
-            return Result<VisitItem>.Fail("Тривалість — ціле число хвилин більше 0");
+            return Result<VisitItem>.Fail($"Тривалість — ціле число хвилин від 1 до {MaxMinutes}");
         }
 
         return Result<VisitItem>.Ok(new VisitItem(serviceCode.Trim().ToUpperInvariant(), count, unitPrice, duration));
-    }
-
-    /// <summary>Рахує рядки з додатною кількістю.</summary>
-    /// <param name="rows">Кількості, як їх прочитано з файлу.</param>
-    /// <returns>Кількість коректних рядків.</returns>
-    public static int CountValidQuantities(string[] rows)
-    {
-        ArgumentNullException.ThrowIfNull(rows);
-        int valid = 0;
-        foreach (string row in rows)
-        {
-            if (int.TryParse(row, NumberStyles.None, CultureInfo.InvariantCulture, out int quantity) && quantity > 0)
-            {
-                valid++;
-            }
-        }
-
-        return valid;
     }
 }
