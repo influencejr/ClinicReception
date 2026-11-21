@@ -45,33 +45,30 @@ public class LegacyAppointmentProcessor
     private readonly ShippingPolicy _shipping = new();
     private readonly ReportBuilder _report = new();
 
-    public string Handle(int appointmentId, int patientId, string patientName,
-        string? patientMail, PatientKind patientKind, int patientVisits,
-        List<ServiceLine>? items, AppointmentState state, string currency,
-        DateTime createdAt, bool sendMail)
+    public string Handle(VisitRequest request)
     {
-        string? error = Validate(items, state, patientMail);
+        string? error = Validate(request);
         if (error != null)
         {
             return error;
         }
 
-        _log.Add("ok " + appointmentId);
+        _log.Add("ok " + request.AppointmentId);
 
-        _tmpSum = Subtotal(items!);
-        _tmpDiscount = _discounts.For(_tmpSum, patientKind, patientVisits);
+        _tmpSum = Subtotal(request.Items!);
+        _tmpDiscount = _discounts.For(_tmpSum, request.Patient);
         decimal ship = _shipping.For(_tmpSum - _tmpDiscount);
         decimal total = _tmpSum - _tmpDiscount + ship;
 
-        if (sendMail)
+        if (request.SendMail)
         {
-            _log.Add("mail -> " + patientMail);
+            _log.Add("mail -> " + request.Patient.Email);
         }
 
-        return _report.Build(appointmentId, patientName, items!, currency, _tmpDiscount, ship, total);
+        return _report.Build(request, _tmpDiscount, ship, total);
     }
 
-    private static decimal Subtotal(List<ServiceLine> items)
+    private static decimal Subtotal(IReadOnlyList<ServiceLine> items)
     {
         decimal sum = 0m;
         foreach (ServiceLine item in items)
@@ -83,24 +80,24 @@ public class LegacyAppointmentProcessor
     }
 
     // порядок перевірок той самий, що й у вкладених if: від нього залежить код помилки
-    private static string? Validate(List<ServiceLine>? items, AppointmentState state, string? patientMail)
+    private static string? Validate(VisitRequest request)
     {
-        if (items is null)
+        if (request.Items is null)
         {
             return "ERR: null";
         }
 
-        if (items.Count == 0)
+        if (request.Items.Count == 0)
         {
             return "ERR: empty";
         }
 
-        if (state is not (AppointmentState.New or AppointmentState.Paid))
+        if (request.State is not (AppointmentState.New or AppointmentState.Paid))
         {
             return "ERR: state";
         }
 
-        if (patientMail is null || !patientMail.Contains("@"))
+        if (request.Patient.Email is null || !request.Patient.Email.Contains("@"))
         {
             return "ERR: mail";
         }
@@ -108,10 +105,10 @@ public class LegacyAppointmentProcessor
         return null;
     }
 
-    public decimal Preview(PatientKind patientKind, int patientVisits, List<ServiceLine> items)
+    public decimal Preview(Patient patient, IReadOnlyList<ServiceLine> items)
     {
         decimal subtotal = Subtotal(items);
-        decimal payable = subtotal - _discounts.For(subtotal, patientKind, patientVisits);
+        decimal payable = subtotal - _discounts.For(subtotal, patient);
         return payable + _shipping.For(payable);
     }
 

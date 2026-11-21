@@ -6,21 +6,18 @@ namespace ClinicReception.Legacy;
 public sealed class ReportBuilder
 {
     /// <summary>Будує звіт: заголовок, пацієнт, рядки послуг, знижка, доставка, разом.</summary>
-    /// <param name="appointmentId">Номер запису.</param>
-    /// <param name="patientName">Ім'я пацієнта.</param>
-    /// <param name="items">Послуги прийому.</param>
-    /// <param name="currency">Код валюти.</param>
+    /// <param name="request">Дані запису: номер, пацієнт, послуги, валюта.</param>
     /// <param name="discount">Знижка, грн.</param>
     /// <param name="shipping">Доставка, грн.</param>
     /// <param name="total">Разом до сплати, грн.</param>
     /// <returns>Текст звіту з переведенням рядка "\n" після кожного рядка.</returns>
-    public string Build(int appointmentId, string patientName, List<ServiceLine> items, string currency,
-        decimal discount, decimal shipping, decimal total)
+    public string Build(VisitRequest request, decimal discount, decimal shipping, decimal total)
     {
+        string currency = request.Currency;
         StringBuilder text = new();
-        text.Append("Документ #").Append(appointmentId).Append('\n');
-        text.Append("Клієнт: ").Append(patientName).Append('\n');
-        foreach (ServiceLine item in items)
+        text.Append("Документ #").Append(request.AppointmentId).Append('\n');
+        text.Append("Клієнт: ").Append(request.Patient.Name).Append('\n');
+        foreach (ServiceLine item in request.Items!)
         {
             text.Append(Line(item, currency));
         }

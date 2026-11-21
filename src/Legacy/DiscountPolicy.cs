@@ -5,21 +5,20 @@ public sealed class DiscountPolicy
 {
     /// <summary>Обчислює знижку, обмежену <see cref="PricingRules.MaxDiscount"/>.</summary>
     /// <param name="subtotal">Сума послуг без знижки, грн.</param>
-    /// <param name="kind">Вид пацієнта.</param>
-    /// <param name="visits">Кількість попередніх візитів.</param>
+    /// <param name="patient">Пацієнт: вид і кількість попередніх візитів.</param>
     /// <returns>Знижка, грн.</returns>
-    public decimal For(decimal subtotal, PatientKind kind, int visits)
+    public decimal For(decimal subtotal, Patient patient)
     {
         decimal rate = 0m;
-        if (kind == PatientKind.Vip)
+        if (patient.Kind == PatientKind.Vip)
         {
             rate = PricingRules.VipRate;
         }
-        else if (kind == PatientKind.Staff)
+        else if (patient.Kind == PatientKind.Staff)
         {
             rate = PricingRules.StaffRate;
         }
-        else if (visits > PricingRules.LoyalVisits)
+        else if (patient.VisitCount > PricingRules.LoyalVisits)
         {
             rate = PricingRules.LoyalRate;
         }
