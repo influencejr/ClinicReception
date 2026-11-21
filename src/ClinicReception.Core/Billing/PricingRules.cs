@@ -27,6 +27,9 @@ public static class PricingRules
     /// <summary>Частка середньої знижки за обсягом.</summary>
     public const decimal MediumVisitRate = 0.05m;
 
+    /// <summary>Найбільша знижка за обсягом, грн.</summary>
+    public const decimal MaxVolumeDiscount = 1000m;
+
     /// <summary>Частка знижки за прийом у неділю.</summary>
     public const decimal SundayRate = 0.02m;
 
