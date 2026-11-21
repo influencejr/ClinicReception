@@ -11,6 +11,23 @@ namespace ClinicReception.App.Input;
 public static class VisitItemParser
 {
     /// <summary>
+    /// Розбирає послугу, введену одним рядком: код, кількість, ціна, хвилини
+    /// через пробіл, наприклад «LAB-02 1 180,50 10».
+    /// </summary>
+    /// <param name="line">Рядок з консолі.</param>
+    /// <returns>Послуга або пояснення, що введено не так.</returns>
+    public static Result<VisitItem> Parse(string? line)
+    {
+        string[] parts = (line ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 4)
+        {
+            return Result<VisitItem>.Fail("Потрібно чотири значення через пробіл: код, кількість, ціна, хвилини");
+        }
+
+        return Parse(parts[0], parts[1], parts[2], parts[3]);
+    }
+
+    /// <summary>
     /// Розбирає введені поля послуги. Дробову частину ціни можна відокремити
     /// і комою, і крапкою, від мови системи це не залежить.
     /// </summary>
