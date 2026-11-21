@@ -74,6 +74,19 @@ dotnet run --project src/ClinicReception.App 2>&1 >/dev/null
 dotnet test
 ```
 
+Покриття рахує coverlet, HTML-звіт будує ReportGenerator
+(`dotnet tool install -g dotnet-reportgenerator-globaltool`):
+
+```bash
+dotnet test --collect:"XPlat Code Coverage"
+reportgenerator -reports:"tests/**/coverage.cobertura.xml" -targetdir:coverage
+```
+
+Каталоги `TestResults/` і `coverage/` до репозиторію не потрапляють. Таблиці
+тестових даних і непокритих гілок — у [docs/testing.md](docs/testing.md).
+Ручні тестові дублери (фейк сховища, стаби політики цін і сповіщувача) лежать
+у `tests/ClinicReception.Tests/Doubles`.
+
 ## Стандарт кодування
 
 Правила описано у файлі [CODING_STANDARD.md](CODING_STANDARD.md) і закріплено
@@ -95,6 +108,7 @@ dotnet build
 | ЛР № 4 | Конструювання класів: інкапсуляція та принципи SOLID | `lab4` |
 | ЛР № 5 | Обробка помилок, винятків і логування | `lab5` |
 | ЛР № 6 | Рефакторинг успадкованого коду за каталогом рефакторингів | `lab6` |
+| ЛР № 7 | Модульне тестування та розробка через тестування (TDD) | `lab7` |
 
 ## Відомі обмеження
 
