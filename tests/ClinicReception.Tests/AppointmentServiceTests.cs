@@ -4,6 +4,7 @@ using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Services;
 using ClinicReception.Core.Storage;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ClinicReception.Tests;
 
@@ -17,7 +18,8 @@ public class AppointmentServiceTests
         _service = new AppointmentService(
             _repository,
             new StandardPricingPolicy(),
-            new TextWriterNotifier(TextWriter.Null));
+            new TextWriterNotifier(TextWriter.Null),
+            NullLogger<AppointmentService>.Instance);
     }
 
     [Fact]

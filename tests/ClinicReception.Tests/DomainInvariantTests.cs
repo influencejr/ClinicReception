@@ -4,6 +4,7 @@ using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Services;
 using ClinicReception.Core.Storage;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ClinicReception.Tests;
 
@@ -33,7 +34,8 @@ public class DomainInvariantTests
         AppointmentService service = new(
             new InMemoryAppointmentRepository(),
             new DiscountPricingPolicy(0.10m),
-            new TextWriterNotifier(TextWriter.Null));
+            new TextWriterNotifier(TextWriter.Null),
+            NullLogger<AppointmentService>.Instance);
         Appointment appointment = NewAppointment(2);
         appointment.AddItem(new VisitItem("CONS-01", 2, 100m, 20));
 
