@@ -1,5 +1,7 @@
 # ClinicReception
 
+![CI](https://github.com/influencejr/ClinicReception/actions/workflows/ci.yml/badge.svg)
+
 Навчальний проєкт з дисципліни «Конструювання програмного забезпечення».
 Варіант № 4: запис пацієнтів на прийом до лікаря.
 
