@@ -140,30 +140,9 @@ public class LegacyAppointmentProcessor
 
     public decimal Preview(PatientKind patientKind, int patientVisits, List<ServiceLine> items)
     {
-        decimal s = 0m;
-        foreach (var it in items)
-        {
-            s += it.Qty * it.Price;
-        }
-        decimal d = 0m;
-        if (patientKind == PatientKind.Vip)
-        {
-            d = s * PricingRules.VipRate;
-            if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
-        }
-        else if (patientKind == PatientKind.Staff)
-        {
-            d = s * PricingRules.StaffRate;
-            if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
-        }
-        else if (patientVisits > PricingRules.LoyalVisits)
-        {
-            d = s * PricingRules.LoyalRate;
-            if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
-        }
-        decimal sh = 0m;
-        if (s - d < PricingRules.FreeShipFrom) sh = PricingRules.ShipCost;
-        return s - d + sh;
+        decimal subtotal = Subtotal(items);
+        decimal payable = subtotal - DiscountOf(subtotal, patientKind, patientVisits);
+        return payable + ShippingOf(payable);
     }
 
     public string DescribeClient(Patient c)
