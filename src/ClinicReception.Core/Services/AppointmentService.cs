@@ -1,6 +1,7 @@
 using System.Globalization;
 using ClinicReception.Core.Abstractions;
 using ClinicReception.Core.Domain;
+using ClinicReception.Core.Errors;
 
 namespace ClinicReception.Core.Services;
 
@@ -53,19 +54,17 @@ public sealed class AppointmentService
         _notifier.Notify(patient.Email, message);
     }
 
-    /// <summary>Додає послугу до збереженого запису.</summary>
+    /// <summary>Додає перевірену послугу до збереженого запису.</summary>
     /// <param name="appointmentId">Номер запису.</param>
-    /// <param name="serviceCode">Код послуги.</param>
-    /// <param name="quantity">Кількість, як її ввели в консолі.</param>
-    /// <param name="price">Ціна за одиницю, як її ввели в консолі.</param>
-    /// <param name="minutes">Тривалість однієї одиниці, хв, як її ввели в консолі.</param>
-    public void AddItem(int appointmentId, string serviceCode, string quantity, string price, string minutes)
+    /// <param name="item">Послуга, вже розібрана й перевірена на межі застосунку.</param>
+    /// <exception cref="ArgumentNullException">Послугу не передано.</exception>
+    /// <exception cref="DomainRuleException">Запису немає або його вже закрито.</exception>
+    public void AddItem(int appointmentId, VisitItem item)
     {
-        Appointment appointment = _repository.GetById(appointmentId)!;
-        int q = int.Parse(quantity, CultureInfo.CurrentCulture);
-        decimal p = decimal.Parse(price, CultureInfo.CurrentCulture);
-        int m = int.Parse(minutes, CultureInfo.CurrentCulture);
-        appointment.AddItem(new VisitItem(serviceCode, q, p, m));
+        ArgumentNullException.ThrowIfNull(item);
+        Appointment appointment = _repository.GetById(appointmentId)
+            ?? throw new DomainRuleException("appointment.exists", $"Запис № {appointmentId} не знайдено");
+        appointment.AddItem(item);
     }
 
     /// <summary>

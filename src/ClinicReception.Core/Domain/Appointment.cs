@@ -1,3 +1,5 @@
+using ClinicReception.Core.Errors;
+
 namespace ClinicReception.Core.Domain;
 
 /// <summary>
@@ -73,13 +75,13 @@ public sealed class Appointment
     /// <summary>Додає послугу до відкритого запису.</summary>
     /// <param name="item">Послуга, яку отримає пацієнт під час прийому.</param>
     /// <exception cref="ArgumentNullException">Послугу не передано.</exception>
-    /// <exception cref="InvalidOperationException">Запис уже закрито.</exception>
+    /// <exception cref="DomainRuleException">Запис уже закрито.</exception>
     public void AddItem(VisitItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
         if (IsClosed)
         {
-            throw new InvalidOperationException($"Запис № {Id} закрито ({Status}), послуги додавати не можна.");
+            throw new DomainRuleException("appointment.editable", $"Запис № {Id} закрито ({Status}), послуги додавати не можна");
         }
 
         _items.Add(item);
