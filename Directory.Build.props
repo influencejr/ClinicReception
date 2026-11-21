@@ -15,5 +15,9 @@
     <VersionPrefix>0.8.0</VersionPrefix>
     <Authors>Вовк Давід</Authors>
     <Product>ClinicReception</Product>
+    <!-- аудит пакетів під час restore, разом із транзитивними; через
+         TreatWarningsAsErrors вразливий пакет ламає складання -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
   </PropertyGroup>
 </Project>
