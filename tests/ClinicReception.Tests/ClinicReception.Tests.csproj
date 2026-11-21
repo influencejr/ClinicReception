@@ -6,6 +6,9 @@
     <!-- XML-документація для тестів не генерується: поведінку описує ім'я тесту (N13),
          тому службове повідомлення StyleCop про вимкнений аналіз документації не потрібне -->
     <NoWarn>$(NoWarn);SA0001</NoWarn>
+    <!-- Program.cs лише складає об'єкти й веде діалог, його перевіряє запуск
+         застосунку, тому в поріг покриття він не входить -->
+    <ExcludeByFile>**/Program.cs</ExcludeByFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +32,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ClinicReception.Core\ClinicReception.Core.csproj" />
+    <!-- барикада вводу VisitItemParser живе в застосунку -->
+    <ProjectReference Include="..\..\src\ClinicReception.App\ClinicReception.App.csproj" />
   </ItemGroup>
 
 </Project>
