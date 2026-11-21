@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <!-- XML-документація для тестів не генерується: поведінку описує ім'я тесту (N13),
-         тому службове повідомлення StyleCop про вимкнений аналіз документації не потрібне -->
-    <NoWarn>$(NoWarn);SA0001</NoWarn>
+    <!-- файл документації потрібен, щоб у складанні працювало IDE0005 (зайві using);
+         самі XML-коментарі тестам не потрібні, поведінку описує ім'я тесту (N-13) -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <!-- Program.cs лише складає об'єкти й веде діалог, його перевіряє запуск
          застосунку, тому в поріг покриття він не входить -->
     <ExcludeByFile>**/Program.cs</ExcludeByFile>

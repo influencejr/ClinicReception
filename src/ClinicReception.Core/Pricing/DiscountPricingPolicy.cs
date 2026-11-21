@@ -1,5 +1,4 @@
 using ClinicReception.Core.Abstractions;
-using ClinicReception.Core.Billing;
 using ClinicReception.Core.Domain;
 
 namespace ClinicReception.Core.Pricing;
@@ -26,6 +25,6 @@ public sealed class DiscountPricingPolicy : IPricingPolicy
     public decimal PriceOf(VisitItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        return Math.Round(item.Amount * (1m - _rate), PricingRules.MoneyDecimalPlaces);
+        return Money.Round(item.Amount * (1m - _rate));
     }
 }

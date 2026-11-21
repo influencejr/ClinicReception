@@ -10,8 +10,11 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <!-- набір правил зафіксовано на версії 8.0: latest на SDK 10 дав би правила,
          яких немає в SDK 8 на сервері CI -->
-    <AnalysisLevel>8.0-recommended</AnalysisLevel>
+    <AnalysisLevel>8.0</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- XML-документація публічних членів (C-06); тести й Legacy вимикають її у своїх csproj -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <VersionPrefix>0.8.0</VersionPrefix>
     <Authors>Вовк Давід</Authors>
     <Product>ClinicReception</Product>
@@ -20,4 +23,8 @@
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditMode>all</NuGetAuditMode>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- поріг цикломатичної складності для CA1502 (S-11) -->
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt" />
+  </ItemGroup>
 </Project>
