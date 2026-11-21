@@ -53,6 +53,21 @@ public sealed class AppointmentService
         _notifier.Notify(patient.Email, message);
     }
 
+    /// <summary>Додає послугу до збереженого запису.</summary>
+    /// <param name="appointmentId">Номер запису.</param>
+    /// <param name="serviceCode">Код послуги.</param>
+    /// <param name="quantity">Кількість, як її ввели в консолі.</param>
+    /// <param name="price">Ціна за одиницю, як її ввели в консолі.</param>
+    /// <param name="minutes">Тривалість однієї одиниці, хв, як її ввели в консолі.</param>
+    public void AddItem(int appointmentId, string serviceCode, string quantity, string price, string minutes)
+    {
+        Appointment appointment = _repository.GetById(appointmentId)!;
+        int q = int.Parse(quantity, CultureInfo.CurrentCulture);
+        decimal p = decimal.Parse(price, CultureInfo.CurrentCulture);
+        int m = int.Parse(minutes, CultureInfo.CurrentCulture);
+        appointment.AddItem(new VisitItem(serviceCode, q, p, m));
+    }
+
     /// <summary>
     /// Обчислює вартість запису: ціни послуг за політикою, а якщо сума більша
     /// за <see cref="LargeVisitFrom"/>, мінус <see cref="LargeVisitDiscount"/>.
