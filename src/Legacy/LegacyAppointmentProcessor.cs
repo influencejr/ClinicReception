@@ -55,36 +55,14 @@ public class LegacyAppointmentProcessor
 
         _log.Add("ok " + appointmentId);
 
-        _tmpSum = 0m;
-        for (int i = 0; i < items!.Count; i++)
-        {
-            _tmpSum += items[i].Qty * items[i].Price;
-        }
-
-        _tmpDiscount = 0m;
-        if (patientKind == PatientKind.Vip)
-        {
-            _tmpDiscount = _tmpSum * PricingRules.VipRate;
-            if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
-        }
-        else if (patientKind == PatientKind.Staff)
-        {
-            _tmpDiscount = _tmpSum * PricingRules.StaffRate;
-            if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
-        }
-        else if (patientVisits > PricingRules.LoyalVisits)
-        {
-            _tmpDiscount = _tmpSum * PricingRules.LoyalRate;
-            if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
-        }
-
-        decimal ship = 0m;
-        if (_tmpSum - _tmpDiscount < PricingRules.FreeShipFrom) ship = PricingRules.ShipCost;
+        _tmpSum = Subtotal(items!);
+        _tmpDiscount = DiscountOf(_tmpSum, patientKind, patientVisits);
+        decimal ship = ShippingOf(_tmpSum - _tmpDiscount);
         decimal total = _tmpSum - _tmpDiscount + ship;
 
         string txt = "Документ #" + appointmentId + "\n";
         txt += "Клієнт: " + patientName + "\n";
-        for (int i = 0; i < items.Count; i++)
+        for (int i = 0; i < items!.Count; i++)
         {
             txt += items[i].Code + " x" + items[i].Qty + " = "
                 + (items[i].Qty * items[i].Price).ToString("0.00")
@@ -100,6 +78,39 @@ public class LegacyAppointmentProcessor
         }
         return txt;
     }
+
+    private static decimal Subtotal(List<ServiceLine> items)
+    {
+        decimal sum = 0m;
+        foreach (ServiceLine item in items)
+        {
+            sum += item.Qty * item.Price;
+        }
+
+        return sum;
+    }
+
+    private static decimal DiscountOf(decimal subtotal, PatientKind kind, int visits)
+    {
+        decimal rate = 0m;
+        if (kind == PatientKind.Vip)
+        {
+            rate = PricingRules.VipRate;
+        }
+        else if (kind == PatientKind.Staff)
+        {
+            rate = PricingRules.StaffRate;
+        }
+        else if (visits > PricingRules.LoyalVisits)
+        {
+            rate = PricingRules.LoyalRate;
+        }
+
+        return Math.Min(subtotal * rate, PricingRules.MaxDiscount);
+    }
+
+    private static decimal ShippingOf(decimal payable) =>
+        payable < PricingRules.FreeShipFrom ? PricingRules.ShipCost : 0m;
 
     // порядок перевірок той самий, що й у вкладених if: від нього залежить код помилки
     private static string? Validate(List<ServiceLine>? items, AppointmentState state, string? patientMail)
