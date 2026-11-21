@@ -43,6 +43,7 @@ public class LegacyAppointmentProcessor
     private readonly List<string> _log = new();
     private readonly DiscountPolicy _discounts = new();
     private readonly ShippingPolicy _shipping = new();
+    private readonly ReportBuilder _report = new();
 
     public string Handle(int appointmentId, int patientId, string patientName,
         string? patientMail, PatientKind patientKind, int patientVisits,
@@ -62,23 +63,12 @@ public class LegacyAppointmentProcessor
         decimal ship = _shipping.For(_tmpSum - _tmpDiscount);
         decimal total = _tmpSum - _tmpDiscount + ship;
 
-        string txt = "Документ #" + appointmentId + "\n";
-        txt += "Клієнт: " + patientName + "\n";
-        for (int i = 0; i < items!.Count; i++)
-        {
-            txt += items[i].Code + " x" + items[i].Qty + " = "
-                + (items[i].Qty * items[i].Price).ToString("0.00")
-                + " " + currency + "\n";
-        }
-        txt += "Знижка: " + _tmpDiscount.ToString("0.00") + " " + currency + "\n";
-        txt += "Доставка: " + ship.ToString("0.00") + " " + currency + "\n";
-        txt += "Разом: " + total.ToString("0.00") + " " + currency + "\n";
-
         if (sendMail)
         {
             _log.Add("mail -> " + patientMail);
         }
-        return txt;
+
+        return _report.Build(appointmentId, patientName, items!, currency, _tmpDiscount, ship, total);
     }
 
     private static decimal Subtotal(List<ServiceLine> items)
