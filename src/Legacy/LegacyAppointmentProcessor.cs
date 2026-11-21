@@ -41,6 +41,8 @@ public class LegacyAppointmentProcessor
     private decimal _tmpSum;
     private decimal _tmpDiscount;
     private readonly List<string> _log = new();
+    private readonly DiscountPolicy _discounts = new();
+    private readonly ShippingPolicy _shipping = new();
 
     public string Handle(int appointmentId, int patientId, string patientName,
         string? patientMail, PatientKind patientKind, int patientVisits,
@@ -56,8 +58,8 @@ public class LegacyAppointmentProcessor
         _log.Add("ok " + appointmentId);
 
         _tmpSum = Subtotal(items!);
-        _tmpDiscount = DiscountOf(_tmpSum, patientKind, patientVisits);
-        decimal ship = ShippingOf(_tmpSum - _tmpDiscount);
+        _tmpDiscount = _discounts.For(_tmpSum, patientKind, patientVisits);
+        decimal ship = _shipping.For(_tmpSum - _tmpDiscount);
         decimal total = _tmpSum - _tmpDiscount + ship;
 
         string txt = "Документ #" + appointmentId + "\n";
@@ -90,28 +92,6 @@ public class LegacyAppointmentProcessor
         return sum;
     }
 
-    private static decimal DiscountOf(decimal subtotal, PatientKind kind, int visits)
-    {
-        decimal rate = 0m;
-        if (kind == PatientKind.Vip)
-        {
-            rate = PricingRules.VipRate;
-        }
-        else if (kind == PatientKind.Staff)
-        {
-            rate = PricingRules.StaffRate;
-        }
-        else if (visits > PricingRules.LoyalVisits)
-        {
-            rate = PricingRules.LoyalRate;
-        }
-
-        return Math.Min(subtotal * rate, PricingRules.MaxDiscount);
-    }
-
-    private static decimal ShippingOf(decimal payable) =>
-        payable < PricingRules.FreeShipFrom ? PricingRules.ShipCost : 0m;
-
     // порядок перевірок той самий, що й у вкладених if: від нього залежить код помилки
     private static string? Validate(List<ServiceLine>? items, AppointmentState state, string? patientMail)
     {
@@ -141,8 +121,8 @@ public class LegacyAppointmentProcessor
     public decimal Preview(PatientKind patientKind, int patientVisits, List<ServiceLine> items)
     {
         decimal subtotal = Subtotal(items);
-        decimal payable = subtotal - DiscountOf(subtotal, patientKind, patientVisits);
-        return payable + ShippingOf(payable);
+        decimal payable = subtotal - _discounts.For(subtotal, patientKind, patientVisits);
+        return payable + _shipping.For(payable);
     }
 
     public string DescribeClient(Patient c)
