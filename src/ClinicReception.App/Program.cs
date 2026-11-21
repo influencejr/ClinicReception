@@ -1,7 +1,9 @@
 using System.Text;
+using ClinicReception.App.Input;
 using ClinicReception.Core.Abstractions;
 using ClinicReception.Core.Billing;
 using ClinicReception.Core.Domain;
+using ClinicReception.Core.Errors;
 using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Reporting;
@@ -45,6 +47,37 @@ appointment.AddItem(new VisitItem("ECG-01", 1, 350m, 15));
 Console.WriteLine();
 service.Book(appointment, patient);
 Console.WriteLine($"Сума: {service.TotalOf(appointment):0.00}");
+
+// ЛР 5: послуги вводяться з консолі й проходять через барикаду VisitItemParser
+Console.WriteLine();
+Console.WriteLine($"Додавання послуг до запису № {appointment.Id}: код кількість ціна хвилини, порожній рядок - завершити");
+while (true)
+{
+    Console.Write("Послуга: ");
+    string? line = Console.ReadLine();
+    if (string.IsNullOrWhiteSpace(line))
+    {
+        break;
+    }
+
+    Result<VisitItem> parsed = VisitItemParser.Parse(line);
+    if (!parsed.IsSuccess)
+    {
+        Console.WriteLine($"Помилка вводу: {parsed.Error}");
+        continue;
+    }
+
+    try
+    {
+        service.AddItem(appointment.Id, parsed.Value!);
+        Console.WriteLine($"Додано {parsed.Value!.ServiceCode}, сума запису {service.TotalOf(appointment):0.00} грн");
+    }
+    catch (DomainRuleException ex)
+    {
+        Console.WriteLine($"Не виконано: {ex.Message}");
+    }
+}
+
 Console.WriteLine();
 Console.Write(AppointmentCsvReport.BuildCsv(repository.GetAll()));
 
