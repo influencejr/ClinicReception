@@ -67,20 +67,13 @@ public static class VisitItemParser
     /// <returns>Кількість коректних рядків.</returns>
     public static int CountValidQuantities(string[] rows)
     {
+        ArgumentNullException.ThrowIfNull(rows);
         int valid = 0;
         foreach (string row in rows)
         {
-            try
+            if (int.TryParse(row, NumberStyles.None, CultureInfo.InvariantCulture, out int quantity) && quantity > 0)
             {
-                int quantity = int.Parse(row, CultureInfo.InvariantCulture);
-                if (quantity > 0)
-                {
-                    valid++;
-                }
-            }
-            catch (FormatException)
-            {
-                // не число - пропускаємо
+                valid++;
             }
         }
 

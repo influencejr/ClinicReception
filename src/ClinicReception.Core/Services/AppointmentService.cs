@@ -62,9 +62,7 @@ public sealed class AppointmentService
     public void AddItem(int appointmentId, VisitItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        Appointment appointment = _repository.GetById(appointmentId)
-            ?? throw new DomainRuleException("appointment.exists", $"Запис № {appointmentId} не знайдено");
-        appointment.AddItem(item);
+        Get(appointmentId).AddItem(item);
     }
 
     /// <summary>Підтверджує запис після дзвінка пацієнтові.</summary>
@@ -72,44 +70,26 @@ public sealed class AppointmentService
     /// <exception cref="DomainRuleException">Запису немає, він порожній або вже не в стані Scheduled.</exception>
     public void Confirm(int appointmentId)
     {
-        Appointment appointment = _repository.GetById(appointmentId)
-            ?? throw new DomainRuleException("appointment.exists", $"Запис № {appointmentId} не знайдено");
-        appointment.Confirm();
+        Get(appointmentId).Confirm();
     }
 
-    /// <summary>Завантажує запис за номером.</summary>
+    /// <summary>Повертає збережений запис за номером.</summary>
     /// <param name="appointmentId">Номер запису.</param>
-    /// <returns>Запис або null.</returns>
-    public Appointment? Load(int appointmentId)
-    {
-        try
-        {
-            return _repository.GetById(appointmentId);
-        }
-        catch (Exception)
-        {
-        }
+    /// <returns>Знайдений запис.</returns>
+    /// <exception cref="DomainRuleException">Запису з таким номером немає.</exception>
+    public Appointment Get(int appointmentId) =>
+        _repository.GetById(appointmentId)
+            ?? throw new DomainRuleException("appointment.exists", $"Запис № {appointmentId} не знайдено");
 
-        return null;
-    }
-
-    /// <summary>Скасовує запис.</summary>
+    /// <summary>Скасовує запис до прийому.</summary>
     /// <param name="appointmentId">Номер запису.</param>
     /// <param name="reason">Причина скасування.</param>
+    /// <exception cref="ArgumentException">Причину не вказано.</exception>
+    /// <exception cref="DomainRuleException">Запису немає або його вже закрито.</exception>
     public void Cancel(int appointmentId, string reason)
     {
-        try
-        {
-            Appointment appointment = _repository.GetById(appointmentId)!;
-            appointment.Cancel();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Щось пішло не так");
-#pragma warning disable CA2200 // антипатерн з методички ЛР 5, виправляється наступним комітом
-            throw ex;
-#pragma warning restore CA2200
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+        Get(appointmentId).Cancel();
     }
 
     /// <summary>
