@@ -47,4 +47,15 @@ public class AppointmentServiceTests
 
         Assert.Equal("appointment.exists", error.Rule);
     }
+
+    [Fact]
+    public void Cancel_TwiceSameAppointment_SecondThrowsTransition()
+    {
+        _repository.Add(new Appointment(2, 10, "DOC-THER-01", new DateOnly(2026, 3, 10), new TimeOnly(10, 0)));
+        _service.Cancel(2, "пацієнт захворів");
+
+        DomainRuleException error = Assert.Throws<DomainRuleException>(() => _service.Cancel(2, "повторно"));
+
+        Assert.Equal("appointment.transition", error.Rule);
+    }
 }
