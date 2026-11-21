@@ -30,4 +30,12 @@ public class VolumeDiscountTests
 
         Assert.Equal("amount", error.ParamName);
     }
+
+    [Fact]
+    public void VolumeDiscountOf_HugeVisit_IsCappedAtMax()
+    {
+        decimal actual = VisitTotalCalculator.VolumeDiscountOf(20000m);
+
+        Assert.Equal(1000m, actual);
+    }
 }
