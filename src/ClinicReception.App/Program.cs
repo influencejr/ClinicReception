@@ -83,6 +83,14 @@ static void Run(ILoggerFactory factory)
     ReadItems(service, appointment.Id);
     Console.WriteLine();
     Console.Write(AppointmentCsvReport.BuildCsv(repository.GetAll()));
+    ExportReport("appointments.csv", repository.GetAll());
+}
+
+static void ExportReport(string path, IReadOnlyList<Appointment> appointments)
+{
+    StreamWriter writer = new(path);
+    writer.Write(AppointmentCsvReport.BuildCsv(appointments));
+    writer.Close();
 }
 
 static IPricingPolicy PricingFor(string patientType)
