@@ -18,11 +18,18 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Установити .NET 8
+        id: dotnet
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
 
-      # на образі runner можуть бути й новіші SDK, тож версію виводимо в анотацію
+      # на образі runner уже є новіші SDK, і без global.json dotnet бере
+      # найновіший; global.json створюється лише тут, бо локально стоїть SDK 10
+      - name: Закріпити SDK 8
+        run: >
+          dotnet new globaljson --force
+          --sdk-version ${{ steps.dotnet.outputs.dotnet-version }}
+
       - name: Показати версію SDK
         run: echo "::notice::.NET SDK $(dotnet --version)"
 
