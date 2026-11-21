@@ -23,7 +23,7 @@ public static class VisitTotalCalculator
         total += RegistrationFeeOf(total, request.RegistrationFee);
         total = request.Status == VisitStatus.Cancelled
             ? 0m
-            : Math.Round(Math.Max(total, 0m), PricingRules.MoneyDecimalPlaces);
+            : Money.Round(Math.Max(total, 0m));
         return new TotalResult(total, NextStatusOf(request.Status, total));
     }
 

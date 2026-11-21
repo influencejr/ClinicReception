@@ -142,7 +142,7 @@ public class Visit
 
         // ПДВ нараховується на суму вже після всіх знижок
         total += total * VatRate;
-        return Math.Round(total, 2);
+        return Money.Round(total);
     }
 
     /// <summary>
