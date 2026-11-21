@@ -116,13 +116,18 @@ dotnet test -c Release /p:CollectCoverage=true /p:Threshold=60 /p:ThresholdType=
 
 ## Стандарт кодування
 
-Правила описано у файлі [CODING_STANDARD.md](CODING_STANDARD.md) і закріплено
-в `.editorconfig`, `Directory.Build.props` та аналізаторах Roslyn і StyleCop.
-Складання налаштовано в режимі «попередження як помилки». Перевірка:
+Правила описано у файлі [CODING_STANDARD.md](CODING_STANDARD.md) (версія 2.0)
+і закріплено в `.editorconfig`, `Directory.Build.props`, `CodeMetricsConfig.txt`,
+`src/ClinicReception.Core/BannedSymbols.txt` та аналізаторах Roslyn і StyleCop.
+Те, чого не бачить машина, перевіряє рецензент за
+[чеклістом огляду](docs/standard/review-checklist.md); зміни правил записано в
+[журналі рішень](docs/standard/decisions.md). Перевірка перед комітом:
 
 ```bash
 dotnet format --verify-no-changes
-dotnet build
+dotnet build -c Release -warnaserror
+dotnet test -c Release --no-build
+bash scripts/check-source.sh
 ```
 
 ## Виконані роботи
@@ -137,6 +142,7 @@ dotnet build
 | ЛР № 6 | Рефакторинг успадкованого коду за каталогом рефакторингів | `lab6` |
 | ЛР № 7 | Модульне тестування та розробка через тестування (TDD) | `lab7` |
 | ЛР № 8 | Складання, статичний аналіз і безперервна інтеграція | `v0.8.0` |
+| СР № 1 | Стандарт кодування та довідник конструктивних практик команди | `sr1` |
 
 ## Відомі обмеження
 
