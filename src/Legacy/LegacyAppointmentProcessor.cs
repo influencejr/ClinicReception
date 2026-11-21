@@ -3,12 +3,27 @@ using System.Collections.Generic;
 
 namespace ClinicReception.Legacy;
 
+public enum PatientKind
+{
+    Regular,
+    Vip,
+    Staff,
+}
+
+public enum AppointmentState
+{
+    Draft,
+    New,
+    Paid,
+    Closed,
+}
+
 public class Patient
 {
     public int Id;
     public string Name = "";
     public string Email = "";
-    public string Kind = "regular";
+    public PatientKind Kind = PatientKind.Regular;
     public int VisitCount;
     public DateTime SinceUtc;
 }
@@ -28,15 +43,15 @@ public class LegacyAppointmentProcessor
     private readonly List<string> _log = new();
 
     public string Handle(int appointmentId, int patientId, string patientName,
-        string? patientMail, string patientKind, int patientVisits,
-        List<ServiceLine>? items, string state, string currency,
+        string? patientMail, PatientKind patientKind, int patientVisits,
+        List<ServiceLine>? items, AppointmentState state, string currency,
         DateTime createdAt, bool sendMail)
     {
         if (items != null)
         {
             if (items.Count > 0)
             {
-                if (state == "new" || state == "paid")
+                if (state == AppointmentState.New || state == AppointmentState.Paid)
                 {
                     if (patientMail != null && patientMail.Contains("@"))
                     {
@@ -69,12 +84,12 @@ public class LegacyAppointmentProcessor
         }
 
         _tmpDiscount = 0m;
-        if (patientKind == "vip")
+        if (patientKind == PatientKind.Vip)
         {
             _tmpDiscount = _tmpSum * PricingRules.VipRate;
             if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
         }
-        else if (patientKind == "staff")
+        else if (patientKind == PatientKind.Staff)
         {
             _tmpDiscount = _tmpSum * PricingRules.StaffRate;
             if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
@@ -108,7 +123,7 @@ public class LegacyAppointmentProcessor
         return txt;
     }
 
-    public decimal Preview(string patientKind, int patientVisits, List<ServiceLine> items)
+    public decimal Preview(PatientKind patientKind, int patientVisits, List<ServiceLine> items)
     {
         decimal s = 0m;
         foreach (var it in items)
@@ -116,12 +131,12 @@ public class LegacyAppointmentProcessor
             s += it.Qty * it.Price;
         }
         decimal d = 0m;
-        if (patientKind == "vip")
+        if (patientKind == PatientKind.Vip)
         {
             d = s * PricingRules.VipRate;
             if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
         }
-        else if (patientKind == "staff")
+        else if (patientKind == PatientKind.Staff)
         {
             d = s * PricingRules.StaffRate;
             if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
@@ -139,7 +154,7 @@ public class LegacyAppointmentProcessor
     public string DescribeClient(Patient c)
     {
         string s = c.Name.Trim().ToUpper();
-        if (c.Kind == "vip") s += " [VIP]";
+        if (c.Kind == PatientKind.Vip) s += " [VIP]";
         if (c.VisitCount > PricingRules.LoyalVisits) s += " [ЛОЯЛЬНИЙ]";
         s += " <" + c.Email.ToLower() + ">";
         int years = DateTime.Now.Year - c.SinceUtc.Year;
