@@ -39,6 +39,13 @@ catch (DomainRuleException ex)
     log.LogWarning("Правило {Rule}: {Message}", ex.Rule, ex.Message);
     return 1;
 }
+catch (IOException ex)
+{
+    // FileAuditLog не відкрився: файл тримає інша копія програми
+    log.LogError(ex, "Журнал аудиту недоступний");
+    Console.Error.WriteLine("Журнал аудиту зайнятий, закрийте інші копії програми.");
+    return 3;
+}
 catch (Exception ex)
 {
     log.LogCritical(ex, "Непередбачений збій, роботу завершено");
@@ -48,6 +55,9 @@ catch (Exception ex)
 
 static void Run(ILoggerFactory factory)
 {
+    // using гарантує, що файл аудиту закриється й тоді, коли далі вилетить виняток
+    using FileAuditLog audit = new("audit.log");
+
     // ЛР 3: розрахунок вартості візиту
     TotalRequest request = BuildSampleRequest();
     TotalResult result = VisitTotalCalculator.Calculate(request);
@@ -69,6 +79,7 @@ static void Run(ILoggerFactory factory)
     appointment.AddItem(new VisitItem("ECG-01", 1, 350m, 15));
     Console.WriteLine();
     service.Book(appointment, patient);
+    audit.Write("book", appointment.Id);
     Console.WriteLine($"Сума: {service.TotalOf(appointment):0.00}");
 
     // ЛР 5: поштовий сервер недоступний - запис має зберегтися, а збій потрапити в журнал
@@ -77,20 +88,31 @@ static void Run(ILoggerFactory factory)
     Appointment secondVisit = new(2, 11, "DOC-CARD-02", new DateOnly(2026, 3, 10), new TimeOnly(11, 0));
     secondVisit.AddItem(new VisitItem("CONS-02", 1, 800m, 30));
     offline.Book(secondVisit, second);
+    audit.Write("book", secondVisit.Id);
 
     // ЛР 5: послуги вводяться з консолі й проходять через барикаду VisitItemParser
     Console.WriteLine();
-    ReadItems(service, appointment.Id);
+    ReadItems(service, audit, appointment.Id);
     Console.WriteLine();
     Console.Write(AppointmentCsvReport.BuildCsv(repository.GetAll()));
-    ExportReport("appointments.csv", repository.GetAll());
+    ExportReport(Path.Combine("reports", "appointments.csv"), repository.GetAll(), factory.CreateLogger("ClinicReception.App"));
 }
 
-static void ExportReport(string path, IReadOnlyList<Appointment> appointments)
+static void ExportReport(string path, IReadOnlyList<Appointment> appointments, ILogger log)
 {
-    StreamWriter writer = new(path);
-    writer.Write(AppointmentCsvReport.BuildCsv(appointments));
-    writer.Close();
+    try
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        using StreamWriter writer = new(path);
+        writer.Write(AppointmentCsvReport.BuildCsv(appointments));
+        Console.WriteLine($"Звіт збережено у {path}");
+    }
+    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+    {
+        // звіт - не головна операція: повідомляємо й працюємо далі
+        log.LogError(ex, "Звіт не збережено у {Path}", path);
+        Console.WriteLine($"Звіт не збережено у {path}");
+    }
 }
 
 static IPricingPolicy PricingFor(string patientType)
@@ -105,7 +127,7 @@ static IPricingPolicy PricingFor(string patientType)
     return policies.TryGetValue(patientType, out IPricingPolicy? found) ? found : new StandardPricingPolicy();
 }
 
-static void ReadItems(AppointmentService service, int appointmentId)
+static void ReadItems(AppointmentService service, FileAuditLog audit, int appointmentId)
 {
     Console.WriteLine($"Додавання послуг до запису № {appointmentId}: код кількість ціна хвилини, порожній рядок - завершити");
     while (true)
@@ -127,6 +149,7 @@ static void ReadItems(AppointmentService service, int appointmentId)
         try
         {
             service.AddItem(appointmentId, parsed.Value!);
+            audit.Write("add-item", appointmentId);
             Console.WriteLine($"Додано {parsed.Value!.ServiceCode}, сума запису {service.TotalOf(service.Get(appointmentId)):0.00} грн");
         }
         catch (DomainRuleException ex)
