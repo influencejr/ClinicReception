@@ -1,5 +1,6 @@
 using System.Globalization;
 using ClinicReception.Core.Domain;
+using ClinicReception.Tests.Doubles;
 
 namespace ClinicReception.Tests;
 
@@ -152,6 +153,16 @@ public class VisitTests
         {
             CultureInfo.CurrentCulture = previous;
         }
+    }
+
+    [Fact]
+    public void Constructor_FixedClock_StoresCreationMoment()
+    {
+        DateTimeOffset now = new(2026, 11, 22, 9, 30, 0, TimeSpan.Zero);
+
+        Visit visit = new("V-2004", "Іваненко", new FixedClock(now));
+
+        Assert.Equal(now, visit.CreatedAt);
     }
 
     [Fact]

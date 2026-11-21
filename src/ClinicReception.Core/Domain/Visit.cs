@@ -49,14 +49,15 @@ public class Visit
     /// </summary>
     /// <param name="id">Номер візиту, наприклад «V-1001».</param>
     /// <param name="patientName">Прізвище пацієнта.</param>
+    /// <param name="clock">Джерело поточного часу; без нього береться системний годинник.</param>
     /// <exception cref="ArgumentException">Номер або прізвище порожні.</exception>
-    public Visit(string id, string patientName)
+    public Visit(string id, string patientName, TimeProvider? clock = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
         ArgumentException.ThrowIfNullOrWhiteSpace(patientName);
         Id = id;
         PatientName = patientName;
-        CreatedAt = DateTimeOffset.Now;
+        CreatedAt = (clock ?? TimeProvider.System).GetLocalNow();
     }
 
     /// <summary>

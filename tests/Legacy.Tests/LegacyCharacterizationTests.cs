@@ -1,5 +1,4 @@
 using System.Globalization;
-using ClinicReception.Legacy;
 
 namespace ClinicReception.Legacy.Tests;
 

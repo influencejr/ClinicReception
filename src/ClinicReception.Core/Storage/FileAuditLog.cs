@@ -9,15 +9,18 @@ namespace ClinicReception.Core.Storage;
 public sealed class FileAuditLog : IDisposable
 {
     private readonly StreamWriter _writer;
+    private readonly TimeProvider _clock;
     private bool _disposed;
 
     /// <summary>Відкриває файл аудиту для дописування.</summary>
     /// <param name="path">Шлях до файлу; якщо файлу немає, його буде створено.</param>
+    /// <param name="clock">Джерело часу для рядків журналу; без нього береться системний годинник.</param>
     /// <exception cref="IOException">Файл зайнятий іншим процесом.</exception>
     /// <exception cref="UnauthorizedAccessException">Немає прав на запис.</exception>
-    public FileAuditLog(string path)
+    public FileAuditLog(string path, TimeProvider? clock = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        _clock = clock ?? TimeProvider.System;
         _writer = new StreamWriter(path, append: true);
     }
 
@@ -29,7 +32,7 @@ public sealed class FileAuditLog : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentException.ThrowIfNullOrWhiteSpace(operation);
-        _writer.WriteLine(string.Create(CultureInfo.InvariantCulture, $"{DateTimeOffset.Now:O};{operation};{appointmentId}"));
+        _writer.WriteLine(string.Create(CultureInfo.InvariantCulture, $"{_clock.GetLocalNow():O};{operation};{appointmentId}"));
     }
 
     /// <summary>Скидає буфер і закриває файл. Повторний виклик нічого не робить.</summary>

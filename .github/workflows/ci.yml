@@ -39,6 +39,9 @@ jobs:
       - name: Перевірка форматування
         run: dotnet format --verify-no-changes --no-restore
 
+      - name: Заборонені конструкції
+        run: bash scripts/check-source.sh
+
       - name: Складання Release з аналізаторами
         run: dotnet build -c Release --no-restore
 

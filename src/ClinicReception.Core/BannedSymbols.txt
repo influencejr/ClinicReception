@@ -1,0 +1,4 @@
+﻿T:System.Console;S-15: бібліотека логіки не працює з консоллю, вивід - справа ClinicReception.App
+T:System.DateTime;D-16: момент у часі - DateTimeOffset, дата - DateOnly, час доби - TimeOnly
+P:System.DateTimeOffset.Now;D-17: поточний час - лише через TimeProvider, інакше код не протестувати
+P:System.DateTimeOffset.UtcNow;D-17: поточний час - лише через TimeProvider, інакше код не протестувати
