@@ -69,27 +69,12 @@ public sealed class AppointmentService
 
     /// <summary>Підтверджує запис після дзвінка пацієнтові.</summary>
     /// <param name="appointmentId">Номер запису.</param>
-    /// <returns>0 — успіх, -1 — запису немає, -2 — стан не той, -3 — у записі немає послуг.</returns>
-    public int Confirm(int appointmentId)
+    /// <exception cref="DomainRuleException">Запису немає, він порожній або вже не в стані Scheduled.</exception>
+    public void Confirm(int appointmentId)
     {
-        Appointment? appointment = _repository.GetById(appointmentId);
-        if (appointment == null)
-        {
-            return -1;
-        }
-
-        if (appointment.Status != VisitStatus.Scheduled)
-        {
-            return -2;
-        }
-
-        if (appointment.Items.Count == 0)
-        {
-            return -3;
-        }
-
+        Appointment appointment = _repository.GetById(appointmentId)
+            ?? throw new DomainRuleException("appointment.exists", $"Запис № {appointmentId} не знайдено");
         appointment.Confirm();
-        return 0;
     }
 
     /// <summary>

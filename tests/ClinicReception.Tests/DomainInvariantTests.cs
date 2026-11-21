@@ -1,4 +1,5 @@
 using ClinicReception.Core.Domain;
+using ClinicReception.Core.Errors;
 using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Services;
@@ -16,12 +17,13 @@ public class DomainInvariantTests
     }
 
     [Fact]
-    public void Complete_NotConfirmed_ThrowsInvalidOperation()
+    public void Complete_NotConfirmed_ThrowsDomainRule()
     {
         Appointment appointment = NewAppointment(1);
         appointment.AddItem(new VisitItem("CONS-01", 1, 250m, 20));
 
-        Assert.Throws<InvalidOperationException>(() => appointment.Complete());
+        DomainRuleException error = Assert.Throws<DomainRuleException>(() => appointment.Complete());
+        Assert.Equal("appointment.transition", error.Rule);
         Assert.Equal(VisitStatus.Scheduled, appointment.Status);
     }
 
