@@ -47,38 +47,16 @@ public class LegacyAppointmentProcessor
         List<ServiceLine>? items, AppointmentState state, string currency,
         DateTime createdAt, bool sendMail)
     {
-        if (items != null)
+        string? error = Validate(items, state, patientMail);
+        if (error != null)
         {
-            if (items.Count > 0)
-            {
-                if (state == AppointmentState.New || state == AppointmentState.Paid)
-                {
-                    if (patientMail != null && patientMail.Contains("@"))
-                    {
-                        _log.Add("ok " + appointmentId);
-                    }
-                    else
-                    {
-                        return "ERR: mail";
-                    }
-                }
-                else
-                {
-                    return "ERR: state";
-                }
-            }
-            else
-            {
-                return "ERR: empty";
-            }
-        }
-        else
-        {
-            return "ERR: null";
+            return error;
         }
 
+        _log.Add("ok " + appointmentId);
+
         _tmpSum = 0m;
-        for (int i = 0; i < items.Count; i++)
+        for (int i = 0; i < items!.Count; i++)
         {
             _tmpSum += items[i].Qty * items[i].Price;
         }
@@ -121,6 +99,32 @@ public class LegacyAppointmentProcessor
             _log.Add("mail -> " + patientMail);
         }
         return txt;
+    }
+
+    // порядок перевірок той самий, що й у вкладених if: від нього залежить код помилки
+    private static string? Validate(List<ServiceLine>? items, AppointmentState state, string? patientMail)
+    {
+        if (items is null)
+        {
+            return "ERR: null";
+        }
+
+        if (items.Count == 0)
+        {
+            return "ERR: empty";
+        }
+
+        if (state is not (AppointmentState.New or AppointmentState.Paid))
+        {
+            return "ERR: state";
+        }
+
+        if (patientMail is null || !patientMail.Contains("@"))
+        {
+            return "ERR: mail";
+        }
+
+        return null;
     }
 
     public decimal Preview(PatientKind patientKind, int patientVisits, List<ServiceLine> items)
