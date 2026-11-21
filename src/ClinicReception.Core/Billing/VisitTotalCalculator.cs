@@ -66,7 +66,13 @@ public static class VisitTotalCalculator
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
         if (amount > PricingRules.LargeVisitFrom)
         {
-            return amount * PricingRules.LargeVisitRate;
+            decimal discount = amount * PricingRules.LargeVisitRate;
+            if (discount > PricingRules.MaxVolumeDiscount)
+            {
+                discount = PricingRules.MaxVolumeDiscount;
+            }
+
+            return discount;
         }
 
         if (amount > PricingRules.MediumVisitFrom)
