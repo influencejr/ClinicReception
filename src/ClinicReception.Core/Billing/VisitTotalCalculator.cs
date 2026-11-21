@@ -60,27 +60,14 @@ public static class VisitTotalCalculator
 
     /// <summary>Обчислює знижку за обсягом візиту.</summary>
     /// <param name="amount">Сума після попередніх знижок, грн.</param>
-    /// <returns>Розмір знижки, грн; 0, якщо сума не перевищує нижнього порогу.</returns>
+    /// <returns>
+    /// Розмір знижки, грн, не більший за <see cref="PricingRules.MaxVolumeDiscount"/>;
+    /// 0, якщо сума не перевищує нижнього порогу.
+    /// </returns>
     public static decimal VolumeDiscountOf(decimal amount)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
-        if (amount > PricingRules.LargeVisitFrom)
-        {
-            decimal discount = amount * PricingRules.LargeVisitRate;
-            if (discount > PricingRules.MaxVolumeDiscount)
-            {
-                discount = PricingRules.MaxVolumeDiscount;
-            }
-
-            return discount;
-        }
-
-        if (amount > PricingRules.MediumVisitFrom)
-        {
-            return amount * PricingRules.MediumVisitRate;
-        }
-
-        return 0m;
+        return Math.Min(amount * VolumeRateOf(amount), PricingRules.MaxVolumeDiscount);
     }
 
     /// <summary>Обчислює знижку за промокодом.</summary>
@@ -128,5 +115,15 @@ public static class VisitTotalCalculator
         VisitStatus.Scheduled when total > 0m => VisitStatus.Confirmed,
         VisitStatus.Confirmed => VisitStatus.Completed,
         _ => current,
+    };
+
+    /// <summary>Визначає ставку знижки за обсягом за порогами суми.</summary>
+    /// <param name="amount">Невід'ємна сума після попередніх знижок, грн.</param>
+    /// <returns>Частка знижки: велика, середня або 0.</returns>
+    private static decimal VolumeRateOf(decimal amount) => amount switch
+    {
+        > PricingRules.LargeVisitFrom => PricingRules.LargeVisitRate,
+        > PricingRules.MediumVisitFrom => PricingRules.MediumVisitRate,
+        _ => 0m,
     };
 }
