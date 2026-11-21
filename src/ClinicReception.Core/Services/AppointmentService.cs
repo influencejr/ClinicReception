@@ -77,6 +77,41 @@ public sealed class AppointmentService
         appointment.Confirm();
     }
 
+    /// <summary>Завантажує запис за номером.</summary>
+    /// <param name="appointmentId">Номер запису.</param>
+    /// <returns>Запис або null.</returns>
+    public Appointment? Load(int appointmentId)
+    {
+        try
+        {
+            return _repository.GetById(appointmentId);
+        }
+        catch (Exception)
+        {
+        }
+
+        return null;
+    }
+
+    /// <summary>Скасовує запис.</summary>
+    /// <param name="appointmentId">Номер запису.</param>
+    /// <param name="reason">Причина скасування.</param>
+    public void Cancel(int appointmentId, string reason)
+    {
+        try
+        {
+            Appointment appointment = _repository.GetById(appointmentId)!;
+            appointment.Cancel();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Щось пішло не так");
+#pragma warning disable CA2200 // антипатерн з методички ЛР 5, виправляється наступним комітом
+            throw ex;
+#pragma warning restore CA2200
+        }
+    }
+
     /// <summary>
     /// Обчислює вартість запису: ціни послуг за політикою, а якщо сума більша
     /// за <see cref="LargeVisitFrom"/>, мінус <see cref="LargeVisitDiscount"/>.
