@@ -71,22 +71,22 @@ public class LegacyAppointmentProcessor
         _tmpDiscount = 0m;
         if (patientKind == "vip")
         {
-            _tmpDiscount = _tmpSum * 0.15m;
-            if (_tmpDiscount > 500m) _tmpDiscount = 500m;
+            _tmpDiscount = _tmpSum * PricingRules.VipRate;
+            if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
         }
         else if (patientKind == "staff")
         {
-            _tmpDiscount = _tmpSum * 0.30m;
-            if (_tmpDiscount > 500m) _tmpDiscount = 500m;
+            _tmpDiscount = _tmpSum * PricingRules.StaffRate;
+            if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
         }
-        else if (patientVisits > 10)
+        else if (patientVisits > PricingRules.LoyalVisits)
         {
-            _tmpDiscount = _tmpSum * 0.05m;
-            if (_tmpDiscount > 500m) _tmpDiscount = 500m;
+            _tmpDiscount = _tmpSum * PricingRules.LoyalRate;
+            if (_tmpDiscount > PricingRules.MaxDiscount) _tmpDiscount = PricingRules.MaxDiscount;
         }
 
         decimal ship = 0m;
-        if (_tmpSum - _tmpDiscount < 1000m) ship = 60m;
+        if (_tmpSum - _tmpDiscount < PricingRules.FreeShipFrom) ship = PricingRules.ShipCost;
         decimal total = _tmpSum - _tmpDiscount + ship;
 
         string txt = "Документ #" + appointmentId + "\n";
@@ -118,21 +118,21 @@ public class LegacyAppointmentProcessor
         decimal d = 0m;
         if (patientKind == "vip")
         {
-            d = s * 0.15m;
-            if (d > 500m) d = 500m;
+            d = s * PricingRules.VipRate;
+            if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
         }
         else if (patientKind == "staff")
         {
-            d = s * 0.30m;
-            if (d > 500m) d = 500m;
+            d = s * PricingRules.StaffRate;
+            if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
         }
-        else if (patientVisits > 10)
+        else if (patientVisits > PricingRules.LoyalVisits)
         {
-            d = s * 0.05m;
-            if (d > 500m) d = 500m;
+            d = s * PricingRules.LoyalRate;
+            if (d > PricingRules.MaxDiscount) d = PricingRules.MaxDiscount;
         }
         decimal sh = 0m;
-        if (s - d < 1000m) sh = 60m;
+        if (s - d < PricingRules.FreeShipFrom) sh = PricingRules.ShipCost;
         return s - d + sh;
     }
 
@@ -140,7 +140,7 @@ public class LegacyAppointmentProcessor
     {
         string s = c.Name.Trim().ToUpper();
         if (c.Kind == "vip") s += " [VIP]";
-        if (c.VisitCount > 10) s += " [ЛОЯЛЬНИЙ]";
+        if (c.VisitCount > PricingRules.LoyalVisits) s += " [ЛОЯЛЬНИЙ]";
         s += " <" + c.Email.ToLower() + ">";
         int years = DateTime.Now.Year - c.SinceUtc.Year;
         s += " стаж " + years;
