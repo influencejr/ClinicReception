@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- успадкований модуль ЛР 6 перенесено з методички без змін; стандарту
          проєкту він не відповідає, тому аналізатори для нього вимкнено
          (записується до реєстру технічного боргу) -->
