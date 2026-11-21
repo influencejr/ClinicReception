@@ -24,4 +24,13 @@ public sealed class ReportBuilder
 
         return text.ToString();
     }
+
+    /// <summary>Підпис з кількістю позицій.</summary>
+    /// <param name="count">Кількість позицій.</param>
+    /// <returns>Текст підпису.</returns>
+    public string Describe(int count)
+    {
+        string note;
+        return "Позицій: " + count;
+    }
 }
