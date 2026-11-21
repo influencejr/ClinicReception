@@ -67,6 +67,31 @@ public sealed class AppointmentService
         appointment.AddItem(item);
     }
 
+    /// <summary>Підтверджує запис після дзвінка пацієнтові.</summary>
+    /// <param name="appointmentId">Номер запису.</param>
+    /// <returns>0 — успіх, -1 — запису немає, -2 — стан не той, -3 — у записі немає послуг.</returns>
+    public int Confirm(int appointmentId)
+    {
+        Appointment? appointment = _repository.GetById(appointmentId);
+        if (appointment == null)
+        {
+            return -1;
+        }
+
+        if (appointment.Status != VisitStatus.Scheduled)
+        {
+            return -2;
+        }
+
+        if (appointment.Items.Count == 0)
+        {
+            return -3;
+        }
+
+        appointment.Confirm();
+        return 0;
+    }
+
     /// <summary>
     /// Обчислює вартість запису: ціни послуг за політикою, а якщо сума більша
     /// за <see cref="LargeVisitFrom"/>, мінус <see cref="LargeVisitDiscount"/>.
