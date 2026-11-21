@@ -88,34 +88,34 @@ public sealed class Appointment
     }
 
     /// <summary>Підтверджує запис після дзвінка пацієнтові.</summary>
-    /// <exception cref="InvalidOperationException">Запис порожній або перехід заборонено.</exception>
+    /// <exception cref="DomainRuleException">Запис порожній або перехід заборонено.</exception>
     public void Confirm()
     {
         if (_items.Count == 0)
         {
-            throw new InvalidOperationException($"Запис № {Id} не містить жодної послуги.");
+            throw new DomainRuleException("appointment.items", $"Запис № {Id} не містить жодної послуги, підтверджувати нічого");
         }
 
         MoveTo(VisitStatus.Confirmed);
     }
 
     /// <summary>Позначає, що прийом відбувся.</summary>
-    /// <exception cref="InvalidOperationException">Запис не підтверджено.</exception>
+    /// <exception cref="DomainRuleException">Запис не підтверджено.</exception>
     public void Complete() => MoveTo(VisitStatus.Completed);
 
     /// <summary>Позначає, що пацієнт не прийшов на прийом.</summary>
-    /// <exception cref="InvalidOperationException">Запис не підтверджено.</exception>
+    /// <exception cref="DomainRuleException">Запис не підтверджено.</exception>
     public void MarkMissed() => MoveTo(VisitStatus.Missed);
 
     /// <summary>Скасовує запис до прийому.</summary>
-    /// <exception cref="InvalidOperationException">Запис уже закрито.</exception>
+    /// <exception cref="DomainRuleException">Запис уже закрито.</exception>
     public void Cancel() => MoveTo(VisitStatus.Cancelled);
 
     private void MoveTo(VisitStatus target)
     {
         if (!AllowedTransitions.Contains((Status, target)))
         {
-            throw new InvalidOperationException($"Перехід {Status} -> {target} заборонено.");
+            throw new DomainRuleException("appointment.transition", $"Запис № {Id}: перехід {Status} -> {target} заборонено");
         }
 
         Status = target;
