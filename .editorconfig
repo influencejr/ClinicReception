@@ -98,6 +98,18 @@ dotnet_diagnostic.SA1503.severity = warning
 dotnet_diagnostic.SA1516.severity = warning
 # загальне форматування коду (те саме, що перевіряє dotnet format)
 dotnet_diagnostic.IDE0055.severity = warning
+# форматування чисел і дат без явної культури (сервер CI має іншу локаль)
+dotnet_diagnostic.CA1305.severity = warning
+# порівняння й пошук рядків без явного StringComparison
+dotnet_diagnostic.CA1307.severity = warning
+dotnet_diagnostic.CA1309.severity = warning
+dotnet_diagnostic.CA1310.severity = warning
+# змінюваний List<T> у публічному API (за замовчуванням вимкнено)
+dotnet_diagnostic.CA1002.severity = warning
+# структура без власного порівняння на рівність
+dotnet_diagnostic.CA1815.severity = warning
+# перехоплення загального Exception; дозволено лише у верхньому обробнику Program
+dotnet_diagnostic.CA1031.severity = warning
 
 [tests/**.cs]
 # імена тестів за схемою Метод_Умова_Результат (N13) містять підкреслення

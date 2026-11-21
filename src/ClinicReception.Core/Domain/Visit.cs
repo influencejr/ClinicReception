@@ -93,7 +93,7 @@ public class Visit
     /// <returns>Знайдений візит або null, якщо візиту з таким номером немає.</returns>
     /// <exception cref="ArgumentNullException">Список не передано.</exception>
     /// <exception cref="ArgumentException">Номер шуканого візиту порожній.</exception>
-    public static Visit? FindById(List<Visit> visits, string visitId)
+    public static Visit? FindById(IReadOnlyList<Visit> visits, string visitId)
     {
         ArgumentNullException.ThrowIfNull(visits);
         ArgumentException.ThrowIfNullOrWhiteSpace(visitId);

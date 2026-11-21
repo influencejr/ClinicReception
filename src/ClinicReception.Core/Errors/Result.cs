@@ -11,7 +11,7 @@ namespace ClinicReception.Core.Errors;
     "Design",
     "CA1000:Do not declare static members on generic types",
     Justification = "Result<T>.Ok і Result<T>.Fail читаються природніше, ніж окремий негенеричний клас-фабрика.")]
-public readonly struct Result<T>
+public readonly record struct Result<T>
 {
     private Result(bool isSuccess, T? value, string error)
     {
