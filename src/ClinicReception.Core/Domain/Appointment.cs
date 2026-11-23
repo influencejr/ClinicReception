@@ -3,8 +3,8 @@ using ClinicReception.Core.Errors;
 namespace ClinicReception.Core.Domain;
 
 /// <summary>
-/// Запис пацієнта на прийом до лікаря. Агрегат: перелік послуг і стан
-/// змінюються лише через методи, які перевіряють правила з docs/model.md.
+/// Запис пацієнта на прийом до лікаря. Агрегат: перелік послуг, час і стан
+/// змінюються лише через методи, які перевіряють правила з docs/spec.md.
 /// </summary>
 public sealed class Appointment
 {
@@ -16,6 +16,7 @@ public sealed class Appointment
         (VisitStatus.Confirmed, VisitStatus.Completed),
         (VisitStatus.Confirmed, VisitStatus.Missed),
         (VisitStatus.Confirmed, VisitStatus.Cancelled),
+        (VisitStatus.Confirmed, VisitStatus.Scheduled),
     };
 
     private readonly List<VisitItem> _items = new();
@@ -24,21 +25,21 @@ public sealed class Appointment
     /// <param name="id">Номер запису, більший за нуль.</param>
     /// <param name="patientId">Ідентифікатор пацієнта, більший за нуль.</param>
     /// <param name="doctorCode">Код лікаря в довіднику.</param>
-    /// <param name="visitDate">Дата прийому.</param>
-    /// <param name="startTime">Час початку прийому.</param>
+    /// <param name="time">Дата й інтервал прийому.</param>
     /// <exception cref="ArgumentOutOfRangeException">Номер запису або пацієнта не додатний.</exception>
     /// <exception cref="ArgumentException">Код лікаря порожній.</exception>
-    public Appointment(int id, int patientId, string doctorCode, DateOnly visitDate, TimeOnly startTime)
+    /// <exception cref="ArgumentNullException">Час прийому не передано.</exception>
+    public Appointment(int id, int patientId, string doctorCode, VisitTime time)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(patientId);
         ArgumentException.ThrowIfNullOrWhiteSpace(doctorCode);
+        ArgumentNullException.ThrowIfNull(time);
 
         Id = id;
         PatientId = patientId;
         DoctorCode = doctorCode;
-        VisitDate = visitDate;
-        StartTime = startTime;
+        Time = time;
         Status = VisitStatus.Scheduled;
     }
 
@@ -51,11 +52,20 @@ public sealed class Appointment
     /// <summary>Код лікаря, до якого записано пацієнта.</summary>
     public string DoctorCode { get; }
 
+    /// <summary>Дата й інтервал прийому; змінюється лише перенесенням.</summary>
+    public VisitTime Time { get; private set; }
+
     /// <summary>Дата прийому.</summary>
-    public DateOnly VisitDate { get; }
+    public DateOnly VisitDate => Time.VisitDate;
 
     /// <summary>Час початку прийому.</summary>
-    public TimeOnly StartTime { get; }
+    public TimeOnly StartTime => Time.Slot.StartTime;
+
+    /// <summary>Час, коли прийом закінчується і кабінет вільний.</summary>
+    public TimeOnly EndTime => Time.Slot.EndTime;
+
+    /// <summary>Інтервал прийому в межах дати.</summary>
+    public TimeSlot Slot => Time.Slot;
 
     /// <summary>Поточний стан запису; змінюється лише методами-переходами.</summary>
     public VisitStatus Status { get; private set; }
@@ -79,12 +89,27 @@ public sealed class Appointment
     public void AddItem(VisitItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        if (IsClosed)
+        EnsureOpen("послуги додавати не можна");
+        _items.Add(item);
+    }
+
+    /// <summary>
+    /// Переносить відкритий запис на інший час. Підтверджений запис знову стає
+    /// запланованим: новий час пацієнт має підтвердити.
+    /// </summary>
+    /// <param name="newTime">Новий час прийому.</param>
+    /// <exception cref="ArgumentNullException">Час не передано.</exception>
+    /// <exception cref="DomainRuleException">Запис уже закрито.</exception>
+    public void Reschedule(VisitTime newTime)
+    {
+        ArgumentNullException.ThrowIfNull(newTime);
+        EnsureOpen("переносити не можна");
+        if (Status == VisitStatus.Confirmed)
         {
-            throw new DomainRuleException("appointment.editable", $"Запис № {Id} закрито ({Status}), послуги додавати не можна");
+            MoveTo(VisitStatus.Scheduled);
         }
 
-        _items.Add(item);
+        Time = newTime;
     }
 
     /// <summary>Підтверджує запис після дзвінка пацієнтові.</summary>
@@ -110,6 +135,14 @@ public sealed class Appointment
     /// <summary>Скасовує запис до прийому.</summary>
     /// <exception cref="DomainRuleException">Запис уже закрито.</exception>
     public void Cancel() => MoveTo(VisitStatus.Cancelled);
+
+    private void EnsureOpen(string action)
+    {
+        if (IsClosed)
+        {
+            throw new DomainRuleException("appointment.editable", $"Запис № {Id} закрито ({Status}), {action}");
+        }
+    }
 
     private void MoveTo(VisitStatus target)
     {

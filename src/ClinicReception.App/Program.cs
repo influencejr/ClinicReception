@@ -76,7 +76,7 @@ static void Run(ILoggerFactory factory)
         IsRegular = true,
         Phone = "+380671234567",
     };
-    Appointment appointment = new(1, 10, "DOC-THER-01", new DateOnly(2026, 3, 10), new TimeOnly(9, 30));
+    Appointment appointment = new(1, 10, "DOC-THER-01", VisitTime.At(new DateOnly(2026, 3, 10), new TimeOnly(9, 30)));
     appointment.AddItem(new VisitItem("CONS-01", 1, 650m, 20));
     appointment.AddItem(new VisitItem("ECG-01", 1, 350m, 15));
     Console.WriteLine();
@@ -87,7 +87,7 @@ static void Run(ILoggerFactory factory)
     // ЛР 5: поштовий сервер недоступний - запис має зберегтися, а збій потрапити в журнал
     AppointmentService offline = new(repository, PricingFor("insured"), new OfflineNotifier(), serviceLog);
     Patient second = new(11, "Петренко Андрій Іванович", "a.petrenko@example.com") { HasInsurance = true };
-    Appointment secondVisit = new(2, 11, "DOC-CARD-02", new DateOnly(2026, 3, 10), new TimeOnly(11, 0));
+    Appointment secondVisit = new(2, 11, "DOC-CARD-02", VisitTime.At(new DateOnly(2026, 3, 10), new TimeOnly(11, 0)));
     secondVisit.AddItem(new VisitItem("CONS-02", 1, 800m, 30));
     offline.Book(secondVisit, second);
     audit.Write("book", secondVisit.Id);
