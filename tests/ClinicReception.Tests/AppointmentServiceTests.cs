@@ -3,7 +3,7 @@ using ClinicReception.Core.Errors;
 using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Services;
-using ClinicReception.Core.Storage;
+using ClinicReception.Infrastructure.Storage;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ClinicReception.Tests;

@@ -34,6 +34,7 @@
     <ProjectReference Include="..\..\src\ClinicReception.Core\ClinicReception.Core.csproj" />
     <!-- барикада вводу VisitItemParser живе в застосунку -->
     <ProjectReference Include="..\..\src\ClinicReception.App\ClinicReception.App.csproj" />
+    <ProjectReference Include="..\..\src\ClinicReception.Infrastructure\ClinicReception.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

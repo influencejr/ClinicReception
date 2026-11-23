@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace ClinicReception.Core.Storage;
+namespace ClinicReception.Infrastructure.Storage;
 
 /// <summary>
 /// Журнал аудиту у файлі: по рядку на операцію (час, операція, номер запису).

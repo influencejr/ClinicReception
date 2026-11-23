@@ -1,5 +1,5 @@
 using ClinicReception.Core.Errors;
-using ClinicReception.Core.Storage;
+using ClinicReception.Infrastructure.Storage;
 
 namespace ClinicReception.Tests;
 

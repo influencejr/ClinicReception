@@ -1,7 +1,7 @@
 using ClinicReception.Core.Abstractions;
 using ClinicReception.Core.Domain;
 
-namespace ClinicReception.Core.Storage;
+namespace ClinicReception.Infrastructure.Storage;
 
 /// <summary>Сховище записів у пам'яті: словник за номером запису.</summary>
 public sealed class InMemoryAppointmentRepository : IAppointmentRepository

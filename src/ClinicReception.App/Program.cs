@@ -10,7 +10,7 @@ using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Reporting;
 using ClinicReception.Core.Services;
-using ClinicReception.Core.Storage;
+using ClinicReception.Infrastructure.Storage;
 using Microsoft.Extensions.Logging;
 
 Console.OutputEncoding = Encoding.UTF8;
