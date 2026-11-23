@@ -31,6 +31,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- довідники з теки data для тесту читання JSON -->
+    <None Include="..\..\data\doctors.json;..\..\data\patients.json" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ClinicReception.Core\ClinicReception.Core.csproj" />
     <!-- барикада вводу VisitItemParser живе в застосунку -->
     <ProjectReference Include="..\..\src\ClinicReception.App\ClinicReception.App.csproj" />

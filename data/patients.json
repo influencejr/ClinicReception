@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "fullName": "Іваненко Андрій Петрович",
+    "email": "patient001@example.com",
+    "phone": "0670000001",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 2,
+    "fullName": "Петренко Олена Петрівна",
+    "email": "patient002@example.com",
+    "phone": "0670000002",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 3,
+    "fullName": "Коваленко Олег Петрович",
+    "email": "patient003@example.com",
+    "phone": "0670000003",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 4,
+    "fullName": "Бойко Марія Петрівна",
+    "email": "patient004@example.com",
+    "phone": "0670000004",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 5,
+    "fullName": "Ткачук Дмитро Петрович",
+    "email": "patient005@example.com",
+    "phone": "0670000005",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 6,
+    "fullName": "Олійник Ірина Петрівна",
+    "email": "patient006@example.com",
+    "phone": "0670000006",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 7,
+    "fullName": "Шевченко Микола Петрович",
+    "email": "patient007@example.com",
+    "phone": "0670000007",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 8,
+    "fullName": "Кузьменко Наталія Іванівна",
+    "email": "patient008@example.com",
+    "phone": "0670000008",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 9,
+    "fullName": "Мороз Василь Іванович",
+    "email": "patient009@example.com",
+    "phone": "0670000009",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 10,
+    "fullName": "Павленко Оксана Іванівна",
+    "email": "patient010@example.com",
+    "phone": null,
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 11,
+    "fullName": "Руденко Андрій Іванович",
+    "email": "patient011@example.com",
+    "phone": "0670000011",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 12,
+    "fullName": "Марченко Олена Іванівна",
+    "email": "patient012@example.com",
+    "phone": "0670000012",
+    "isRegular": true,
+    "hasInsurance": true
+  },
+  {
+    "id": 13,
+    "fullName": "Іваненко Олег Іванович",
+    "email": "patient013@example.com",
+    "phone": "0670000013",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 14,
+    "fullName": "Петренко Марія Іванівна",
+    "email": "patient014@example.com",
+    "phone": "0670000014",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 15,
+    "fullName": "Коваленко Дмитро Миколайович",
+    "email": "patient015@example.com",
+    "phone": "0670000015",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 16,
+    "fullName": "Бойко Ірина Миколаївна",
+    "email": "patient016@example.com",
+    "phone": "0670000016",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 17,
+    "fullName": "Ткачук Микола Миколайович",
+    "email": "patient017@example.com",
+    "phone": "0670000017",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 18,
+    "fullName": "Олійник Наталія Миколаївна",
+    "email": "patient018@example.com",
+    "phone": "0670000018",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 19,
+    "fullName": "Шевченко Василь Миколайович",
+    "email": "patient019@example.com",
+    "phone": "0670000019",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 20,
+    "fullName": "Кузьменко Оксана Миколаївна",
+    "email": "patient020@example.com",
+    "phone": null,
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 21,
+    "fullName": "Мороз Андрій Миколайович",
+    "email": "patient021@example.com",
+    "phone": "0670000021",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 22,
+    "fullName": "Павленко Олена Андріївна",
+    "email": "patient022@example.com",
+    "phone": "0670000022",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 23,
+    "fullName": "Руденко Олег Андрійович",
+    "email": "patient023@example.com",
+    "phone": "0670000023",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 24,
+    "fullName": "Марченко Марія Андріївна",
+    "email": "patient024@example.com",
+    "phone": "0670000024",
+    "isRegular": true,
+    "hasInsurance": true
+  },
+  {
+    "id": 25,
+    "fullName": "Іваненко Дмитро Андрійович",
+    "email": "patient025@example.com",
+    "phone": "0670000025",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 26,
+    "fullName": "Петренко Ірина Андріївна",
+    "email": "patient026@example.com",
+    "phone": "0670000026",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 27,
+    "fullName": "Коваленко Микола Андрійович",
+    "email": "patient027@example.com",
+    "phone": "0670000027",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 28,
+    "fullName": "Бойко Наталія Андріївна",
+    "email": "patient028@example.com",
+    "phone": "0670000028",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 29,
+    "fullName": "Ткачук Василь Олегович",
+    "email": "patient029@example.com",
+    "phone": "0670000029",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 30,
+    "fullName": "Олійник Оксана Олегівна",
+    "email": "patient030@example.com",
+    "phone": null,
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 31,
+    "fullName": "Шевченко Андрій Олегович",
+    "email": "patient031@example.com",
+    "phone": "0670000031",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 32,
+    "fullName": "Кузьменко Олена Олегівна",
+    "email": "patient032@example.com",
+    "phone": "0670000032",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 33,
+    "fullName": "Мороз Олег Олегович",
+    "email": "patient033@example.com",
+    "phone": "0670000033",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 34,
+    "fullName": "Павленко Марія Олегівна",
+    "email": "patient034@example.com",
+    "phone": "0670000034",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 35,
+    "fullName": "Руденко Дмитро Олегович",
+    "email": "patient035@example.com",
+    "phone": "0670000035",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 36,
+    "fullName": "Марченко Ірина Петрівна",
+    "email": "patient036@example.com",
+    "phone": "0670000036",
+    "isRegular": true,
+    "hasInsurance": true
+  },
+  {
+    "id": 37,
+    "fullName": "Іваненко Микола Петрович",
+    "email": "patient037@example.com",
+    "phone": "0670000037",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 38,
+    "fullName": "Петренко Наталія Петрівна",
+    "email": "patient038@example.com",
+    "phone": "0670000038",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 39,
+    "fullName": "Коваленко Василь Петрович",
+    "email": "patient039@example.com",
+    "phone": "0670000039",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 40,
+    "fullName": "Бойко Оксана Петрівна",
+    "email": "patient040@example.com",
+    "phone": null,
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 41,
+    "fullName": "Ткачук Андрій Петрович",
+    "email": "patient041@example.com",
+    "phone": "0670000041",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 42,
+    "fullName": "Олійник Олена Петрівна",
+    "email": "patient042@example.com",
+    "phone": "0670000042",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 43,
+    "fullName": "Шевченко Олег Іванович",
+    "email": "patient043@example.com",
+    "phone": "0670000043",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 44,
+    "fullName": "Кузьменко Марія Іванівна",
+    "email": "patient044@example.com",
+    "phone": "0670000044",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 45,
+    "fullName": "Мороз Дмитро Іванович",
+    "email": "patient045@example.com",
+    "phone": "0670000045",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 46,
+    "fullName": "Павленко Ірина Іванівна",
+    "email": "patient046@example.com",
+    "phone": "0670000046",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 47,
+    "fullName": "Руденко Микола Іванович",
+    "email": "patient047@example.com",
+    "phone": "0670000047",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 48,
+    "fullName": "Марченко Наталія Іванівна",
+    "email": "patient048@example.com",
+    "phone": "0670000048",
+    "isRegular": true,
+    "hasInsurance": true
+  },
+  {
+    "id": 49,
+    "fullName": "Іваненко Василь Іванович",
+    "email": "patient049@example.com",
+    "phone": "0670000049",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 50,
+    "fullName": "Петренко Оксана Миколаївна",
+    "email": "patient050@example.com",
+    "phone": null,
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 51,
+    "fullName": "Коваленко Андрій Миколайович",
+    "email": "patient051@example.com",
+    "phone": "0670000051",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 52,
+    "fullName": "Бойко Олена Миколаївна",
+    "email": "patient052@example.com",
+    "phone": "0670000052",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 53,
+    "fullName": "Ткачук Олег Миколайович",
+    "email": "patient053@example.com",
+    "phone": "0670000053",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 54,
+    "fullName": "Олійник Марія Миколаївна",
+    "email": "patient054@example.com",
+    "phone": "0670000054",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 55,
+    "fullName": "Шевченко Дмитро Миколайович",
+    "email": "patient055@example.com",
+    "phone": "0670000055",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 56,
+    "fullName": "Кузьменко Ірина Миколаївна",
+    "email": "patient056@example.com",
+    "phone": "0670000056",
+    "isRegular": false,
+    "hasInsurance": true
+  },
+  {
+    "id": 57,
+    "fullName": "Мороз Микола Андрійович",
+    "email": "patient057@example.com",
+    "phone": "0670000057",
+    "isRegular": true,
+    "hasInsurance": false
+  },
+  {
+    "id": 58,
+    "fullName": "Павленко Наталія Андріївна",
+    "email": "patient058@example.com",
+    "phone": "0670000058",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 59,
+    "fullName": "Руденко Василь Андрійович",
+    "email": "patient059@example.com",
+    "phone": "0670000059",
+    "isRegular": false,
+    "hasInsurance": false
+  },
+  {
+    "id": 60,
+    "fullName": "Марченко Оксана Андріївна",
+    "email": "patient060@example.com",
+    "phone": null,
+    "isRegular": true,
+    "hasInsurance": true
+  }
+]
