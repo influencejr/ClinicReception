@@ -49,5 +49,5 @@ public readonly record struct TimeSlot
     /// <summary>Чи перетинається інтервал з іншим (X-03): суміжні інтервали не перетинаються.</summary>
     /// <param name="other">Інший інтервал.</param>
     /// <returns>true, якщо є спільна хвилина.</returns>
-    public bool Overlaps(TimeSlot other) => StartTime < other.EndTime && other.StartTime < EndTime;
+    public bool Overlaps(TimeSlot other) => StartTime <= other.EndTime && other.StartTime <= EndTime;
 }
