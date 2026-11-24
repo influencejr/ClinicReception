@@ -1,8 +1,9 @@
 name: CI
 
 on:
+  # будь-яка гілка, зокрема ci-demo з навмисно зламаним критерієм (СР 3)
   push:
-    branches: [ main, 'feature/**' ]
+    branches: [ '**' ]
   pull_request:
     branches: [ main ]
 
@@ -43,14 +44,14 @@ jobs:
         run: bash scripts/check-source.sh
 
       - name: Складання Release з аналізаторами
-        run: dotnet build -c Release --no-restore
+        run: dotnet build -c Release --no-restore -warnaserror
 
       - name: Тести й покриття
         run: >
           dotnet test -c Release --no-build
           /p:CollectCoverage=true
           /p:CoverletOutputFormat=cobertura
-          /p:Threshold=60 /p:ThresholdType=line
+          /p:Threshold=70 /p:ThresholdType=line
 
       - name: Зберегти звіт про покриття
         if: always()
