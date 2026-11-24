@@ -37,6 +37,16 @@ public sealed record Doctor
     /// <summary>Вартість консультації, грн.</summary>
     public decimal ConsultationFee { get; }
 
-    /// <summary>Тривалість одного слоту прийому, хв.</summary>
+    /// <summary>Тривалість одного слоту прийому, хв; це й крок сітки розкладу.</summary>
     public int SlotMinutes { get; }
+
+    /// <summary>Початок робочого дня.</summary>
+    public TimeOnly WorkStart { get; init; } = ScheduleRules.DefaultWorkStart;
+
+    /// <summary>Кінець робочого дня; о цій хвилині прийом уже не триває.</summary>
+    public TimeOnly WorkEnd { get; init; } = ScheduleRules.DefaultWorkEnd;
+
+    /// <summary>Робочий час як інтервал [WorkStart; WorkEnd).</summary>
+    /// <exception cref="ArgumentException">Кінець дня не пізніше за початок.</exception>
+    public TimeSlot WorkingHours => new(WorkStart, WorkEnd);
 }

@@ -1,0 +1,74 @@
+[
+  {
+    "code": "DOC-THER-01",
+    "fullName": "Ткаченко Ірина Олегівна",
+    "specialty": "терапевт",
+    "consultationFee": 450,
+    "slotMinutes": 20,
+    "workStart": "08:00:00",
+    "workEnd": "14:00:00"
+  },
+  {
+    "code": "DOC-THER-02",
+    "fullName": "Мельник Андрій Петрович",
+    "specialty": "терапевт",
+    "consultationFee": 450,
+    "slotMinutes": 20,
+    "workStart": "14:00:00",
+    "workEnd": "20:00:00"
+  },
+  {
+    "code": "DOC-CARD-01",
+    "fullName": "Бондар Оксана Ігорівна",
+    "specialty": "кардіолог",
+    "consultationFee": 650,
+    "slotMinutes": 30,
+    "workStart": "09:00:00",
+    "workEnd": "15:00:00"
+  },
+  {
+    "code": "DOC-NEUR-01",
+    "fullName": "Кравець Сергій Миколайович",
+    "specialty": "невролог",
+    "consultationFee": 600,
+    "slotMinutes": 30,
+    "workStart": "10:00:00",
+    "workEnd": "16:00:00"
+  },
+  {
+    "code": "DOC-SURG-01",
+    "fullName": "Шевчук Тарас Васильович",
+    "specialty": "хірург",
+    "consultationFee": 700,
+    "slotMinutes": 20,
+    "workStart": "08:00:00",
+    "workEnd": "13:00:00"
+  },
+  {
+    "code": "DOC-PED-01",
+    "fullName": "Лисенко Наталія Андріївна",
+    "specialty": "педіатр",
+    "consultationFee": 400,
+    "slotMinutes": 15,
+    "workStart": "08:00:00",
+    "workEnd": "14:00:00"
+  },
+  {
+    "code": "DOC-OPHT-01",
+    "fullName": "Гончар Василь Іванович",
+    "specialty": "офтальмолог",
+    "consultationFee": 550,
+    "slotMinutes": 15,
+    "workStart": "12:00:00",
+    "workEnd": "18:00:00"
+  },
+  {
+    "code": "DOC-DERM-01",
+    "fullName": "Савчук Олена Дмитрівна",
+    "specialty": "дерматолог",
+    "consultationFee": 500,
+    "slotMinutes": 20,
+    "workStart": "09:00:00",
+    "workEnd": "13:00:00"
+  }
+]

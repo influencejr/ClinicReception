@@ -3,7 +3,7 @@ using ClinicReception.Core.Errors;
 using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Services;
-using ClinicReception.Core.Storage;
+using ClinicReception.Infrastructure.Storage;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ClinicReception.Tests;
@@ -43,5 +43,5 @@ public class DomainInvariantTests
     }
 
     private static Appointment NewAppointment(int id) =>
-        new(id, 10, "DOC-THER-01", new DateOnly(2026, 3, 10), new TimeOnly(9, 30));
+        new(id, 10, "DOC-THER-01", VisitTime.At(new DateOnly(2026, 3, 10), new TimeOnly(9, 30)));
 }

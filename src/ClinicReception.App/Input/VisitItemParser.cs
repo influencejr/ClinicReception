@@ -50,30 +50,44 @@ public static class VisitItemParser
     /// <returns>Послуга або пояснення, що введено не так.</returns>
     public static Result<VisitItem> Parse(string? serviceCode, string? quantity, string? price, string? minutes)
     {
-        if (string.IsNullOrWhiteSpace(serviceCode) || serviceCode.Trim().Length > MaxCodeLength)
+        if (!TryCode(serviceCode, out string code))
         {
             return Result<VisitItem>.Fail($"Код послуги — від 1 до {MaxCodeLength} символів");
         }
 
-        if (!int.TryParse(quantity, NumberStyles.None, CultureInfo.InvariantCulture, out int count)
-            || count is < 1 or > MaxQuantity)
+        if (!TryCount(quantity, MaxQuantity, out int count))
         {
             return Result<VisitItem>.Fail($"Кількість — ціле число від 1 до {MaxQuantity}");
         }
 
-        string normalizedPrice = (price ?? string.Empty).Trim().Replace(',', '.');
-        if (!decimal.TryParse(normalizedPrice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal unitPrice)
-            || unitPrice > MaxPrice)
+        if (!TryPrice(price, out decimal unitPrice))
         {
             return Result<VisitItem>.Fail($"Ціна — число від 0 до {MaxPrice:0}, наприклад 650,50");
         }
 
-        if (!int.TryParse(minutes, NumberStyles.None, CultureInfo.InvariantCulture, out int duration)
-            || duration is < 1 or > MaxMinutes)
+        if (!TryCount(minutes, MaxMinutes, out int duration))
         {
             return Result<VisitItem>.Fail($"Тривалість — ціле число хвилин від 1 до {MaxMinutes}");
         }
 
-        return Result<VisitItem>.Ok(new VisitItem(serviceCode.Trim().ToUpperInvariant(), count, unitPrice, duration));
+        return Result<VisitItem>.Ok(new VisitItem(code, count, unitPrice, duration));
+    }
+
+    private static bool TryCode(string? text, out string code)
+    {
+        code = (text ?? string.Empty).Trim().ToUpperInvariant();
+        return code.Length is > 0 and <= MaxCodeLength;
+    }
+
+    // ціле число від 1 до max включно
+    private static bool TryCount(string? text, int max, out int value) =>
+        int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out value) && value >= 1 && value <= max;
+
+    // кома й крапка однаково відокремлюють копійки, від мови системи це не залежить
+    private static bool TryPrice(string? text, out decimal value)
+    {
+        string normalized = (text ?? string.Empty).Trim().Replace(',', '.');
+        return decimal.TryParse(normalized, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out value)
+            && value <= MaxPrice;
     }
 }

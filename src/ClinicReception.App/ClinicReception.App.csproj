@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClinicReception.Core\ClinicReception.Core.csproj" />
+    <ProjectReference Include="..\ClinicReception.Infrastructure\ClinicReception.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

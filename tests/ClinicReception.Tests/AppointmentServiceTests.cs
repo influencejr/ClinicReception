@@ -3,7 +3,7 @@ using ClinicReception.Core.Errors;
 using ClinicReception.Core.Notifications;
 using ClinicReception.Core.Pricing;
 using ClinicReception.Core.Services;
-using ClinicReception.Core.Storage;
+using ClinicReception.Infrastructure.Storage;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ClinicReception.Tests;
@@ -34,7 +34,7 @@ public class AppointmentServiceTests
     [Fact]
     public void Confirm_EmptyAppointment_ThrowsWithRule()
     {
-        _repository.Add(new Appointment(1, 10, "DOC-THER-01", new DateOnly(2026, 3, 10), new TimeOnly(9, 30)));
+        _repository.Add(new Appointment(1, 10, "DOC-THER-01", VisitTime.At(new DateOnly(2026, 3, 10), new TimeOnly(9, 30))));
 
         DomainRuleException error = Assert.Throws<DomainRuleException>(() => _service.Confirm(1));
 
@@ -53,7 +53,7 @@ public class AppointmentServiceTests
     [Fact]
     public void Cancel_TwiceSameAppointment_SecondThrowsTransition()
     {
-        _repository.Add(new Appointment(2, 10, "DOC-THER-01", new DateOnly(2026, 3, 10), new TimeOnly(10, 0)));
+        _repository.Add(new Appointment(2, 10, "DOC-THER-01", VisitTime.At(new DateOnly(2026, 3, 10), new TimeOnly(10, 0))));
         _service.Cancel(2, "пацієнт захворів");
 
         DomainRuleException error = Assert.Throws<DomainRuleException>(() => _service.Cancel(2, "повторно"));

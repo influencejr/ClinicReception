@@ -495,3 +495,8 @@ reports/
 # локальні налаштування й секрети не потрапляють у репозиторій (.env закрито вище)
 appsettings.Local.json
 **/*.secrets.json
+
+# робочі файли застосунку в теці data: записи, тимчасовий файл збереження, журнал
+data/appointments.json
+data/*.tmp
+data/logs/

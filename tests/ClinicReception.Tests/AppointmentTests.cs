@@ -35,5 +35,5 @@ public class AppointmentTests
     }
 
     private static Appointment NewAppointment() =>
-        new(1, 10, "DOC-THER-01", new DateOnly(2026, 3, 10), new TimeOnly(9, 30));
+        new(1, 10, "DOC-THER-01", VisitTime.At(new DateOnly(2026, 3, 10), new TimeOnly(9, 30)));
 }

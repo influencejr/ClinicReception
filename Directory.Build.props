@@ -15,7 +15,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <!-- XML-документація публічних членів (C-06); тести й Legacy вимикають її у своїх csproj -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <VersionPrefix>0.8.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>Вовк Давід</Authors>
     <Product>ClinicReception</Product>
     <!-- аудит пакетів під час restore, разом із транзитивними; через

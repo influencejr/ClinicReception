@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legacy.Tests", "Legacy.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicReception.Legacy.Tests", "tests\Legacy.Tests\ClinicReception.Legacy.Tests.csproj", "{4C330752-8BA2-48EB-A423-52057353734B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicReception.Infrastructure", "src\ClinicReception.Infrastructure\ClinicReception.Infrastructure.csproj", "{319EF236-4BB3-4860-A547-C6604BC8BEBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,18 @@ Global
 		{4C330752-8BA2-48EB-A423-52057353734B}.Release|x64.Build.0 = Release|Any CPU
 		{4C330752-8BA2-48EB-A423-52057353734B}.Release|x86.ActiveCfg = Release|Any CPU
 		{4C330752-8BA2-48EB-A423-52057353734B}.Release|x86.Build.0 = Release|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Debug|x64.Build.0 = Debug|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Debug|x86.Build.0 = Debug|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Release|x64.ActiveCfg = Release|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Release|x64.Build.0 = Release|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Release|x86.ActiveCfg = Release|Any CPU
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,5 +115,6 @@ Global
 		{A6268592-4124-4131-9119-07FE1A84BBEC} = {90AACAC6-F01F-4D80-4495-114698DDABE3}
 		{D5672B40-CADF-33B9-0553-9B2F68C217BC} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{4C330752-8BA2-48EB-A423-52057353734B} = {D5672B40-CADF-33B9-0553-9B2F68C217BC}
+		{319EF236-4BB3-4860-A547-C6604BC8BEBE} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal
